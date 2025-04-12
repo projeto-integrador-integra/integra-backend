@@ -1,0 +1,54 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# dotenv
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# VSCode
+.vscode/
+
+# MacOS / Linux / sistema
+.DS_Store
+Thumbs.db
+
+# Husky
+.husky/_/
+
+# Coverage
+coverage/
+
+# Docker
+docker-compose.override.yml
+*.local.yml
+*.local.env
+
+# Lambda build
+lambda.zip
+
+# Drizzle kit
+drizzle/migrations/            
+drizzle/                        
+!drizzle/schema.ts              
+
+# EditorConfig, playgrounds, backups
+*.swp
+*.bak
+*.tmp
+*.tgz
+
+# Cache 
+.cache/

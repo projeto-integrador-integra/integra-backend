@@ -1,0 +1,62 @@
+{
+  "name": "integra-backend",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "docker:up": "docker compose up -d",
+    "build": "tsc",
+    "start": "node --env-file=.env dist/main.js",
+    "prestart": "npm run build",
+    "start:dev": "tsx watch src/main.ts",
+    "db:push": "npx drizzle-kit push",
+    "prepare": "husky",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write .",
+    "db:seed": "tsx src/seed/index.ts"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@aws-sdk/client-ssm": "^3.787.0",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.41.0",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "pg": "^8.14.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "@eslint/js": "^9.24.0",
+    "@faker-js/faker": "^9.6.0",
+    "@types/aws-lambda": "^8.10.149",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.14.0",
+    "@types/pg": "^8.11.11",
+    "drizzle-kit": "^0.30.6",
+    "eslint": "^9.24.0",
+    "eslint-config-prettier": "^10.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.1",
+    "prettier": "^3.5.3",
+    "serverless-http": "^3.2.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.29.1",
+    "vitest": "^3.1.1"
+  }
+}
