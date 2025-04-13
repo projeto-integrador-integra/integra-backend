@@ -15,7 +15,8 @@
     "prepare": "husky",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
-    "db:seed": "tsx src/seed/index.ts"
+    "db:seed": "tsx src/seed/index.ts",
+    "package": "bash scripts/package.sh"
   },
   "lint-staged": {
     "*.{ts,js}": [

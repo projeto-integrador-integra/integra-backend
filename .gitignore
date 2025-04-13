@@ -37,12 +37,13 @@ docker-compose.override.yml
 *.local.env
 
 # Lambda build
-lambda.zip
+build
+*.zip
 
 # Drizzle kit
-drizzle/migrations/            
-drizzle/                        
-!drizzle/schema.ts              
+drizzle/migrations/
+drizzle/
+!drizzle/schema.ts
 
 # EditorConfig, playgrounds, backups
 *.swp
@@ -50,5 +51,5 @@ drizzle/
 *.tmp
 *.tgz
 
-# Cache 
+# Cache
 .cache/
