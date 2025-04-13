@@ -1,0 +1,8 @@
+.github/CODEOWNERS @fer-oshiro
+.github/workflows/deploy.yml @fer-oshiro
+scripts/package-lambda.sh @fer-oshiro
+lambda.ts @fer-oshiro
+main.ts @fer-oshiro
+drizzle.config.ts @fer-oshiro
+package.json @fer-oshiro
+package-lock.json @fer-oshiro
