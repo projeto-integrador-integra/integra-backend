@@ -6,13 +6,14 @@ export const userApprovalStatusEnum = pgEnum('user_approval_status', USER_APPROV
 
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
+  sub: text('sub').notNull().unique(),
+  role: userRoleEnum('role').notNull(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
-  sub: text('sub').notNull().unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
   description: text('description'),
-  role: userRoleEnum('role').notNull(),
-  approvalStatus: text('approval_status').default('active').notNull(),
+  approvalStatus: userApprovalStatusEnum('approval_status').default('pending').notNull(),
 })
 
 export type User = typeof users.$inferSelect

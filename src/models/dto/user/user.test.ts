@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker'
 import { describe, expect, it } from 'vitest'
-import { UserCreationSchema } from './user'
+import { UserCreationSchema } from './create.dto'
 
 describe('UserCreationSchema', () => {
   it('valida um usuário válido', () => {

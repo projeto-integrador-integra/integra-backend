@@ -1,4 +1,5 @@
-import { User, UserCreationType } from '../models/domain/user'
+import { User } from '../models/domain/user'
+import { UserCreationType } from '../models/dto/user/create.dto'
 import { UserRepository } from '../repositories/user.repository'
 
 export class UserService {

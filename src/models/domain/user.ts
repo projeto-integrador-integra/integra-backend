@@ -1,50 +1,31 @@
 import { randomUUID } from 'node:crypto'
-import { z } from 'zod'
+import { UserCreationSchema, UserCreationType } from '../dto/user/create.dto.js'
 import { Serializable } from './types.js'
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
-
-extendZodWithOpenApi(z)
-
-export const UserCreationSchema = z.object({
-  id: z.string().uuid().optional().openapi({ description: 'User ID' }),
-  sub: z.string().uuid(),
-  role: z.enum(['admin', 'mentor', 'dev', 'company']),
-  name: z.string().min(1).max(50),
-  email: z.string().email(),
-  description: z.string().optional().nullable(),
-  createdAt: z.date().optional(),
-  approvalStatus: z.enum(['pending', 'approved', 'rejected', 'suspended']).optional(),
-})
-
-export type UserCreationType = z.infer<typeof UserCreationSchema>
-
-export const UserUpdateSchema = UserCreationSchema.partial().omit({
-  id: true,
-  sub: true,
-  createdAt: true,
-  email: true,
-})
-export type UserUpdateType = z.infer<typeof UserUpdateSchema>
 
 export class User implements Serializable {
   readonly id: string
   name: UserCreationType['name']
   role: UserCreationType['role']
-  email: UserCreationType['email']
-  sub: UserCreationType['sub']
+  email: string
+  sub: string
   description: UserCreationType['description']
   createdAt: Date
+  updatedAt: Date
   approvalStatus: UserCreationType['approvalStatus']
 
   constructor(data: UserCreationType) {
     const parsed = UserCreationSchema.parse(data)
+    if (!parsed.email) throw new Error('Email is required')
+    if (!parsed.sub) throw new Error('Sub is required')
+
+    this.id = parsed.id ?? randomUUID()
     this.name = parsed.name
     this.role = parsed.role
     this.email = parsed.email
     this.sub = parsed.sub
     this.description = parsed.description
     this.createdAt = parsed.createdAt ?? new Date()
-    this.id = parsed.id ?? randomUUID()
+    this.updatedAt = parsed.updatedAt ?? new Date()
     this.approvalStatus = parsed.approvalStatus ?? 'pending'
   }
 
@@ -55,13 +36,14 @@ export class User implements Serializable {
 
   toObject() {
     return {
+      id: this.id,
       name: this.name,
       role: this.role,
       email: this.email,
       sub: this.sub,
-      id: this.id,
       description: this.description,
       createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
       approvalStatus: this.approvalStatus,
     }
   }

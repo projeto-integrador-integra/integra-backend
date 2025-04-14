@@ -1,8 +1,9 @@
 import { Router } from 'express'
+import { registry } from '../config/openapi'
 import type { UserController } from '../controllers/user.controller'
 import validate from '../middleware/validate'
-import { UserCreationSchema, UserUpdateSchema } from '../models/domain/user'
-import { registry } from '../config/openapi'
+import { UserCreationSchema } from '../models/dto/user/create.dto'
+import { UserUpdateSchema } from '../models/dto/user/update.dto'
 
 export function createUserRoutes(controller: UserController): Router {
   const router = Router()
