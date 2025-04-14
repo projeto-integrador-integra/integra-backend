@@ -1,7 +1,7 @@
 import { OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi'
 import { Router } from 'express'
 import swaggerUi from 'swagger-ui-express'
-import { registry } from '../config/openapi'
+import { registry } from '@/config/openapi'
 
 export function createDocsRoutes(): Router {
   const router = Router()

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
-import { USER_APPROVAL_STATUSES, USER_ROLES } from '../../../constants/user'
+import { USER_APPROVAL_STATUSES, USER_ROLES } from '@/constants/user'
 
 extendZodWithOpenApi(z)
 

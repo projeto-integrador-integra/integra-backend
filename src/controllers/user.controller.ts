@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import { UserCreationSchema } from '../models/dto/user/create.dto'
-import { UserService } from '../services/user.service'
+import { UserCreationSchema } from '@/models/dto/user/create.dto'
+import { UserService } from '@/services/user.service'
 
 export interface UserController {
   createUser: (req: Request, res: Response) => Promise<void>

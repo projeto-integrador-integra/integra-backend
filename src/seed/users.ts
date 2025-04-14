@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker'
-import { NewUser } from '../models/schema/user'
+import { NewUser } from '@/models/schema/user'
 
 export function fakeUser(): NewUser {
   return {

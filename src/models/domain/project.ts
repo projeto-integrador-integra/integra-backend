@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { ProjectCreationSchema, ProjectCreationType } from '../dto/project/create.dto.js'
+import { ProjectCreationSchema, ProjectCreationType } from '@/models/dto/project/create.dto'
 import { Serializable } from './types.js'
 import { User } from './user.js'
 

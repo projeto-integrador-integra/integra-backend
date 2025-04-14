@@ -1,6 +1,6 @@
-import { User } from '../models/domain/user'
-import { UserCreationType } from '../models/dto/user/create.dto'
-import { UserRepository } from '../repositories/user.repository'
+import { User } from '@/models/domain/user'
+import { UserCreationType } from '@/models/dto/user/create.dto'
+import { UserRepository } from '@/repositories/user.repository'
 
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}

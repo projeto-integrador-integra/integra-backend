@@ -1,5 +1,5 @@
 import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { USER_APPROVAL_STATUSES, USER_ROLES } from '../../constants/user'
+import { USER_APPROVAL_STATUSES, USER_ROLES } from '@/constants/user'
 
 export const userRoleEnum = pgEnum('user_role', USER_ROLES)
 export const userApprovalStatusEnum = pgEnum('user_approval_status', USER_APPROVAL_STATUSES)

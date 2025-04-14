@@ -1,5 +1,5 @@
 import { boolean, integer, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
-import { PROJECT_APPROVAL_STATUSES, PROJECT_STATUS } from '../../constants/project'
+import { PROJECT_APPROVAL_STATUSES, PROJECT_STATUS } from '@/constants/project'
 import { users } from './user'
 
 export const projectStatusEnum = pgEnum('project_status', PROJECT_STATUS)

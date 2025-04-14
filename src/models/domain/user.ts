@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { UserCreationSchema, UserCreationType } from '../dto/user/create.dto.js'
+import { UserCreationSchema, UserCreationType } from '@/models/dto/user/create.dto'
 import { Serializable } from './types.js'
 
 export class User implements Serializable {

@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { fakeUser } from './users'
-import { getDb } from '../config/drizzle'
-import { users } from '../models/schema/user'
+import { getDb } from '@/config/drizzle'
+import { users } from '@/models/schema/user'
 
 export async function main() {
   const db = await getDb()

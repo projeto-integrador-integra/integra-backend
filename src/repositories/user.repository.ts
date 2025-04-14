@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
-import { User } from '../models/domain/user'
-import { users } from '../models/schema/user'
+import { User } from '@/models/domain/user'
+import { users } from '@/models/schema/user'
 import { eq } from 'drizzle-orm'
 
 export class UserRepository {
