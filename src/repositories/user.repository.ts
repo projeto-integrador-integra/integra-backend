@@ -14,7 +14,11 @@ export class UserRepository {
 
   async getById(id: string): Promise<User | null> {
     const [user] = await this.db.select().from(users).where(eq(users.id, id)).execute()
+    return user ? new User(user) : null
+  }
 
+  async getBySub(sub: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.sub, sub)).execute()
     return user ? new User(user) : null
   }
 }

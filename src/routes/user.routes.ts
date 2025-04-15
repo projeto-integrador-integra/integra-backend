@@ -4,6 +4,7 @@ import type { UserController } from '@/controllers/user.controller'
 import validate from '@/middleware/validate'
 import { UserCreationSchema } from '@/models/dto/user/create.dto'
 import { UserUpdateSchema } from '@/models/dto/user/update.dto'
+import { requiredRole } from '@/middleware/requireRole'
 
 export function createUserRoutes(controller: UserController): Router {
   const router = Router()
@@ -21,7 +22,7 @@ export function createUserRoutes(controller: UserController): Router {
     },
   })
   router.post('/', validate(UserCreationSchema), controller.createUser)
-  router.get('/:id', controller.getUser)
+  router.get('/:id', requiredRole(['admin']), controller.getUser)
 
   return router
 }
