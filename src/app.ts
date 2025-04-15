@@ -1,9 +1,10 @@
 import Express from 'express'
 import helmet from 'helmet'
 import { initDependencies } from './initDependecies'
+import { errorHandler } from './middleware/errorHandler'
+import { injectUser } from './middleware/injectUser'
 import { createDocsRoutes } from './routes/docs.routes'
 import { createUserRoutes } from './routes/user.routes'
-import { injectUser } from './middleware/injectUser'
 
 export async function createApp() {
   const app = Express()
@@ -16,6 +17,8 @@ export async function createApp() {
   app.use('/users', createUserRoutes(controllers.user))
 
   app.use('/docs', createDocsRoutes())
+
+  app.use(errorHandler)
 
   return app
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 
-export const injectUser = () => {
+export function injectUser() {
   return (req: Request, _res: Response, next: NextFunction) => {
     if (process.env.NODE_ENV !== 'production') {
       req.user = {

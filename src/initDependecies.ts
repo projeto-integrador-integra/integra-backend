@@ -11,6 +11,7 @@ export async function initDependencies() {
   const userController = makeUserController(userService)
 
   return {
+    db,
     controllers: {
       user: userController,
     },

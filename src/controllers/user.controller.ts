@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { UserCreationSchema } from '@/models/dto/user/create.dto'
 import { UserService } from '@/services/user.service'
+import { AppError } from '@/errors/AppErro'
 
 export interface UserController {
   createUser: (req: Request, res: Response) => Promise<void>
@@ -23,7 +24,11 @@ export function makeUserController(userService: UserService) {
     async getUser(req: Request, res: Response) {
       const { id } = req.params
       const user = await userService.getById(id)
-      res.json({ message: 'Usuário retornado com sucesso!', user: user?.toObject() })
+      if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
+      res.status(200).json({
+        message: 'Usuário encontrado com sucesso!',
+        user: user.toObject(),
+      })
     },
   }
 }
