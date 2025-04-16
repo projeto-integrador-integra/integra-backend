@@ -8,9 +8,11 @@ export interface UserController {
   createUser: (req: Request, res: Response) => Promise<void>
   listUsers: (req: Request, res: Response) => Promise<void>
   getUserById: (req: Request, res: Response) => Promise<void>
+  updateUserById: (req: Request, res: Response) => Promise<void>
+  getMe: (req: Request, res: Response) => Promise<void>
 }
 
-export function makeUserController(userService: UserService) {
+export function makeUserController(userService: UserService): UserController {
   return {
     async createUser(req: Request, res: Response) {
       const data = UserCreationSchema.parse(req.body)
@@ -34,6 +36,30 @@ export function makeUserController(userService: UserService) {
         total: usersList.total,
         page: query.page,
         limit: query.limit,
+      })
+    },
+
+    async updateUserById(req: Request, res: Response) {
+      // TODO: Implement update user logic
+
+      res.status(200).json({
+        message: 'User updated successfully',
+      })
+    },
+
+    async getMe(req: Request, res: Response) {
+      // TODO: Implement get me logic
+
+      res.status(200).json({
+        id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        sub: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        role: 'admin',
+        name: 'string',
+        email: 'user@example.com',
+        description: 'string',
+        createdAt: 'string',
+        updatedAt: 'string',
+        approvalStatus: 'pending',
       })
     },
   }

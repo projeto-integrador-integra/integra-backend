@@ -12,7 +12,7 @@ export function createProjectRoutes(controller: UserController): Router {
   const router = Router()
 
   registerProjectDocs()
-  router.post('/', validate(UserCreationSchema), controller.createUser)
+  router.get('/', validate(UserCreationSchema), controller.createUser)
 
   return router
 }
