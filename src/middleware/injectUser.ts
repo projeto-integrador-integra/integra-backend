@@ -1,7 +1,8 @@
+import { AppError } from '@/errors/AppErro'
 import { NextFunction, Request, Response } from 'express'
 
 export function injectUser() {
-  return (req: Request, _res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next?: NextFunction) => {
     if (process.env.NODE_ENV !== 'production') {
       req.user = {
         sub: req.headers.sub as string,
@@ -19,6 +20,9 @@ export function injectUser() {
       }
     }
 
-    next()
+    if (!req.user.email || !req.user.sub)
+      throw new AppError('User identity not found', 401, 'USER_NOT_AUTHENTICATED')
+
+    if (next) next()
   }
 }

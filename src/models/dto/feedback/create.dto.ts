@@ -1,11 +1,9 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { z } from 'zod'
+import { FeedbackSchema } from './feedback.dto'
 
 extendZodWithOpenApi(z)
 
-export const CreateFeedbackDTO = z.object({
-  projectId: z.string().uuid(),
-  comment: z.string().min(10).max(1000),
-  link: z.string().url().optional(),
-  rating: z.number().int().min(1).max(5).optional(),
+export const FeedbackCreateSchema = FeedbackSchema.partial().omit({
+  projectId: true,
 })

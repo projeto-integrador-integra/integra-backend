@@ -14,7 +14,6 @@ export function createDocsRoutes(): Router {
       title: 'Integra',
       description: 'Endpoint para a comunicação entre o frontend e o backend do projeto Integra',
     },
-    servers: [{ url: 'v1' }],
   })
 
   router.use('/', swaggerUi.serve, swaggerUi.setup(document))

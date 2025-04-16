@@ -1,20 +1,21 @@
 import { randomUUID } from 'node:crypto'
-import { UserCreationSchema, UserCreationType } from '@/models/dto/user/create.dto'
+import { UserSchema, UserType } from '@/models/dto/user/user.dto'
 import { Serializable } from './types.js'
+import { UserCreationType } from '../dto/user/create.dto.js'
 
 export class User implements Serializable {
   readonly id: string
-  name: UserCreationType['name']
-  role: UserCreationType['role']
+  name: UserType['name']
+  role: UserType['role']
   email: string
   sub: string
-  description: UserCreationType['description']
+  description: UserType['description']
   createdAt: Date
   updatedAt: Date
-  approvalStatus: UserCreationType['approvalStatus']
+  approvalStatus: UserType['approvalStatus']
 
   constructor(data: UserCreationType) {
-    const parsed = UserCreationSchema.parse(data)
+    const parsed = UserSchema.parse(data)
     if (!parsed.email) throw new Error('Email is required')
     if (!parsed.sub) throw new Error('Sub is required')
 
@@ -30,7 +31,7 @@ export class User implements Serializable {
   }
 
   static fromObject(data: Record<string, unknown>) {
-    const parsed = UserCreationSchema.parse(data)
+    const parsed = UserSchema.parse(data)
     return new User(parsed)
   }
 

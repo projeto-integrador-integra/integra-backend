@@ -7,8 +7,7 @@ export class UserRepository {
   constructor(private readonly db: ReturnType<typeof drizzle>) {}
 
   async create(user: User): Promise<User> {
-    const log = await this.db.insert(users).values(user.toObject())
-    console.log('log', log)
+    await this.db.insert(users).values(user.toObject())
     return user
   }
 

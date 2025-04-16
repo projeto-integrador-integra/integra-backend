@@ -1,10 +1,10 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { z } from 'zod'
-import { ProjectCreationSchema } from './create.dto'
+import { ProjectSchema } from './project.dto'
 
 extendZodWithOpenApi(z)
 
-export const ProjectUpdateSchema = ProjectCreationSchema.partial().omit({
+export const ProjectUpdateSchema = ProjectSchema.partial().omit({
   id: true,
   creatorId: true,
   createdAt: true,
@@ -12,4 +12,4 @@ export const ProjectUpdateSchema = ProjectCreationSchema.partial().omit({
   needsMentors: true,
   needsDevs: true,
 })
-export type UserUpdateType = z.infer<typeof ProjectUpdateSchema>
+export type ProjectUpdateType = z.infer<typeof ProjectUpdateSchema>

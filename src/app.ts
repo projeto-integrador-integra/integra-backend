@@ -1,10 +1,11 @@
 import Express from 'express'
 import helmet from 'helmet'
 import { initDependencies } from './initDependecies'
+import { requireAuth } from './middleware/auth'
 import { errorHandler } from './middleware/errorHandler'
 import { createDocsRoutes } from './routes/docs.routes'
-import { protectedRoute } from './routes/protected.routes'
 import { createUserRoutes } from './routes/user.routes'
+import { createProjectRoutes } from './routes/project.routes'
 
 export async function createApp() {
   const { controllers, services } = await initDependencies()
@@ -12,8 +13,8 @@ export async function createApp() {
   app.use(helmet())
   app.use(Express.json())
 
-  const protectedRoutes = protectedRoute(services.user)
-  protectedRoutes.use('/users', createUserRoutes(controllers.user))
+  app.use('/users', requireAuth(services.user), createUserRoutes(controllers.user))
+  app.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.user))
 
   app.use('/docs', createDocsRoutes())
 
