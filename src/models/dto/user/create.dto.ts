@@ -4,7 +4,7 @@ import { UserSchema } from './user.dto'
 
 extendZodWithOpenApi(z)
 
-export const UserCreationSchema = UserSchema.partial().omit({
+export const UserCreationSchema = UserSchema.omit({
   id: true,
   sub: true,
   email: true,

@@ -7,9 +7,7 @@ export function attachUserRole(userService: UserService) {
     if (!req.user?.sub) throw new AppError('Missing user sub', 401, 'UNAUTHORIZED')
     const user = await userService.getBySub(req.user.sub)
     console.log('user', user)
-    if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
-    if (!user.role) throw new AppError('User role not found', 404, 'USER_ROLE_NOT_FOUND')
-    req.user.role = user.role
+    req.user.role = user?.role
     next()
   }
 }

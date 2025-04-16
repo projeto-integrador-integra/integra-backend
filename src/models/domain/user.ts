@@ -1,7 +1,6 @@
-import { randomUUID } from 'node:crypto'
 import { UserSchema, UserType } from '@/models/dto/user/user.dto'
+import { randomUUID } from 'node:crypto'
 import { Serializable } from './types.js'
-import { UserCreationType } from '../dto/user/create.dto.js'
 
 export class User implements Serializable {
   readonly id: string
@@ -14,7 +13,7 @@ export class User implements Serializable {
   updatedAt: Date
   approvalStatus: UserType['approvalStatus']
 
-  constructor(data: UserCreationType) {
+  constructor(data: UserType) {
     const parsed = UserSchema.parse(data)
     if (!parsed.email) throw new Error('Email is required')
     if (!parsed.sub) throw new Error('Sub is required')

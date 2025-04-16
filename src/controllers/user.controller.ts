@@ -1,11 +1,13 @@
-import { Request, Response } from 'express'
-import { UserCreationSchema } from '@/models/dto/user/create.dto'
-import { UserService } from '@/services/user.service'
 import { AppError } from '@/errors/AppErro'
+import { UserCreationSchema } from '@/models/dto/user/create.dto'
+import { ListUsersQuerySchema } from '@/models/dto/user/list.dto'
+import { UserService } from '@/services/user.service'
+import { Request, Response } from 'express'
 
 export interface UserController {
   createUser: (req: Request, res: Response) => Promise<void>
-  getUser: (req: Request, res: Response) => Promise<void>
+  listUsers: (req: Request, res: Response) => Promise<void>
+  getUserById: (req: Request, res: Response) => Promise<void>
 }
 
 export function makeUserController(userService: UserService) {
@@ -14,20 +16,24 @@ export function makeUserController(userService: UserService) {
       const data = UserCreationSchema.parse(req.body)
       const { email, sub } = req.user
       const user = await userService.register({ ...data, email, sub, approvalStatus: 'pending' })
-
-      res.status(201).json({
-        message: 'Usuário criado com sucesso!',
-        user: user.toObject(),
-      })
+      res.status(201).json(user.toObject())
     },
 
-    async getUser(req: Request, res: Response) {
+    async getUserById(req: Request, res: Response) {
       const { id } = req.params
       const user = await userService.getById(id)
       if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
+      res.status(200).json(user.toObject())
+    },
+
+    async listUsers(req: Request, res: Response) {
+      const query = ListUsersQuerySchema.parse(req.query)
+      const usersList = await userService.list(query)
       res.status(200).json({
-        message: 'Usuário encontrado com sucesso!',
-        user: user.toObject(),
+        users: usersList.users.map((user) => user.toObject()),
+        total: usersList.total,
+        page: query.page,
+        limit: query.limit,
       })
     },
   }
