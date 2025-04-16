@@ -1,25 +1,25 @@
 import { randomUUID } from 'node:crypto'
-import { ProjectCreationSchema, ProjectCreationType } from '@/models/dto/project/create.dto'
+import { ProjectSchema, ProjectType } from '../dto/project/project.dto.js'
 import { Serializable } from './types.js'
 import { User } from './user.js'
 
 export class Project implements Serializable {
   readonly id: string
-  name: ProjectCreationType['name']
-  description: ProjectCreationType['description']
-  creatorId: ProjectCreationType['creatorId']
-  tags: ProjectCreationType['tags']
-  needsMentors: ProjectCreationType['needsMentors']
-  needsDevs: ProjectCreationType['needsDevs']
-  maxParticipants: ProjectCreationType['maxParticipants']
-  status: ProjectCreationType['status']
-  approvalStatus: ProjectCreationType['approvalStatus']
-  createdAt: ProjectCreationType['createdAt']
-  updatedAt: ProjectCreationType['updatedAt']
+  name: ProjectType['name']
+  description: ProjectType['description']
+  creatorId: ProjectType['creatorId']
+  tags: ProjectType['tags']
+  needsMentors: ProjectType['needsMentors']
+  needsDevs: ProjectType['needsDevs']
+  maxParticipants: ProjectType['maxParticipants']
+  status: ProjectType['status']
+  approvalStatus: ProjectType['approvalStatus']
+  createdAt: ProjectType['createdAt']
+  updatedAt: ProjectType['updatedAt']
   members: User[]
 
-  constructor(data: ProjectCreationType, members: User[] = []) {
-    const parsed = ProjectCreationSchema.parse(data)
+  constructor(data: ProjectType, members: User[] = []) {
+    const parsed = ProjectSchema.parse(data)
 
     this.id = parsed.id ?? randomUUID()
     this.name = parsed.name
@@ -37,7 +37,7 @@ export class Project implements Serializable {
   }
 
   static fromObject(data: Record<string, unknown>) {
-    const parsed = ProjectCreationSchema.parse(data)
+    const parsed = ProjectSchema.parse(data)
     return new Project(parsed)
   }
 

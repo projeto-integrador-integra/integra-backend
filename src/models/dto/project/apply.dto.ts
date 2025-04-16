@@ -1,7 +1,11 @@
 import { z } from 'zod'
 
 export const ProjectApplySchema = z.object({
-  message: z.string().min(5).max(300).optional(),
+  message: z
+    .string()
+    .max(300, 'Mensagem pode ter no máximo 300 caracteres')
+    .optional()
+    .transform((val) => (val?.trim() === '' ? undefined : val)),
 })
 
 export type ProjectApplyDTO = z.infer<typeof ProjectApplySchema>

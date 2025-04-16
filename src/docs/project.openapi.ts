@@ -246,12 +246,9 @@ export function registerProjectDocs() {
         description: 'Lista de feedbacks do projeto',
         content: {
           'application/json': {
-            schema: {
-              type: 'array',
-              items: {
-                $ref: '#/components/schemas/FeedbackSchema',
-              },
-            },
+            schema: z.object({
+              feedbacks: z.array(FeedbackSchema),
+            }),
           },
         },
       },

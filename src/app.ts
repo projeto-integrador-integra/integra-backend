@@ -14,7 +14,7 @@ export async function createApp() {
   app.use(Express.json())
 
   app.use('/users', requireAuth(services.user), createUserRoutes(controllers.user))
-  app.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.user))
+  app.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.project))
 
   app.use('/docs', createDocsRoutes())
 

@@ -16,7 +16,7 @@ export function createUserRoutes(controller: UserController): Router {
   registerUserDocs()
   router.post('/', validate(UserCreationSchema), controller.createUser)
   router.get('/', requiredRole(['admin']), controller.listUsers)
-  router.get('/me', controller.getMe)
+  router.get('/me', controller.getCurrentUser)
   router.get('/:id', requiredRole(['admin']), controller.getUserById)
   router.patch(
     '/:id',

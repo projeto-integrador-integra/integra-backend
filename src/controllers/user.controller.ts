@@ -9,7 +9,7 @@ export interface UserController {
   listUsers: (req: Request, res: Response) => Promise<void>
   getUserById: (req: Request, res: Response) => Promise<void>
   updateUserById: (req: Request, res: Response) => Promise<void>
-  getMe: (req: Request, res: Response) => Promise<void>
+  getCurrentUser: (req: Request, res: Response) => Promise<void>
 }
 
 export function makeUserController(userService: UserService): UserController {
@@ -47,7 +47,7 @@ export function makeUserController(userService: UserService): UserController {
       })
     },
 
-    async getMe(req: Request, res: Response) {
+    async getCurrentUser(req: Request, res: Response) {
       // TODO: Implement get me logic
 
       res.status(200).json({

@@ -4,7 +4,7 @@ import { ProjectSchema } from './project.dto'
 
 extendZodWithOpenApi(z)
 
-export const ProjectCreationSchema = ProjectSchema.partial().omit({
+export const ProjectCreationSchema = ProjectSchema.omit({
   id: true,
   creatorId: true,
   createdAt: true,

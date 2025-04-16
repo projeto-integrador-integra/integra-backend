@@ -11,7 +11,7 @@ export const projectApprovalStatusEnum = pgEnum(
 export const projects = pgTable('projects', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
-  description: text('description').notNull(),
+  description: text('description'),
   creatorId: uuid('creator_id')
     .notNull()
     .references(() => users.id),
