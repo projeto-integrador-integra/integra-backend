@@ -11,9 +11,8 @@ export const handler = async (event: APIGatewayProxyEventV2, context: Context) =
 
     cachedHandler = serverless(app, {
       request: (req: Request, ev: APIGatewayProxyEventV2) => {
-        if (ev.rawPath.includes('/api')) {
-          req.url = ev.rawPath.replace(/^\/api/, '') || '/'
-        }
+        const path = ev.rawPath
+        req.url = path.replace(/^\/[^/]+\/api/, '') || '/'
       },
     })
   }
