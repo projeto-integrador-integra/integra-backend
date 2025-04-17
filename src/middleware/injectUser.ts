@@ -3,11 +3,9 @@ import { NextFunction, Request, Response } from 'express'
 
 export function injectUser() {
   return (req: Request, _res: Response, next?: NextFunction) => {
-    if (process.env.NODE_ENV !== 'production') {
-      req.user = {
-        sub: req.headers.sub as string,
-        email: req.headers.email as string,
-      }
+    req.user = {
+      sub: req.headers.sub as string,
+      email: req.headers.email as string,
     }
 
     const event = req.apiGateway?.event

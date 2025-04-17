@@ -15,7 +15,12 @@ const schema = z.object({
 
 export function loadLocalEnv() {
   const parsed = schema.parse(process.env)
+  console.log('Loaded environment variables from .env file')
   return {
     DATABASE_URL: `postgres://${parsed.POSTGRES_USER}:${parsed.POSTGRES_PASSWORD}@${parsed.POSTGRES_HOST}:${parsed.POSTGRES_PORT}/${parsed.POSTGRES_DB}`,
+    RESEND_API_KEY: '',
+    COGNITO_USER_POOL_ID: '',
+    COGNITO_CLIENT_ID: '',
+    COGNITO_CLIENT_SECRET: '',
   }
 }
