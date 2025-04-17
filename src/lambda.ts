@@ -11,19 +11,16 @@ export const handler = async (event: APIGatewayProxyEventV2, context: Context) =
 
     cachedHandler = serverless(app, {
       request: (req: Request, ev: APIGatewayProxyEventV2) => {
-        console.log('--- event debug ---')
-        console.log('event.version:', event.version)
-        console.log('isBase64Encoded:', event.isBase64Encoded)
-        console.log('event.headers:', event.headers)
-        console.log('event.body (first 100):', event.body?.slice?.(0, 100))
-        console.log('req.headers:', req.headers)
-        console.log(
-          'req.body type:',
-          typeof req.body,
-          Buffer.isBuffer(req.body) ? 'Buffer' : 'Not Buffer'
-        )
-        console.log('-------------------')
-
+        if (
+          Buffer.isBuffer(req.body) &&
+          ev.headers?.['content-type']?.includes('application/json')
+        ) {
+          try {
+            req.body = JSON.parse(req.body.toString('utf-8'))
+          } catch (e) {
+            console.error('[patch] Erro ao converter Buffer para JSON:', e)
+          }
+        }
         req.url = ev.rawPath.replace(/^\/(default|prod|stage)?/, '').replace(/^\/api/, '') || '/'
       },
     })
