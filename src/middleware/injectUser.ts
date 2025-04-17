@@ -12,7 +12,7 @@ export function injectUser() {
 
     const event = req.apiGateway
     const claims = event?.requestContext?.authorizer?.jwt?.claims
-    console.log('claims', JSON.stringify(req), claims)
+    console.log('claims', event, claims)
 
     if (claims?.sub) {
       req.user = {
