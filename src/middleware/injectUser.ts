@@ -12,6 +12,7 @@ export function injectUser() {
 
     const event = req.event
     const claims = event?.requestContext?.authorizer?.jwt?.claims
+    console.log('claims', event, claims)
 
     if (claims?.sub) {
       req.user = {
