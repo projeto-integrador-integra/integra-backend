@@ -3,6 +3,7 @@ import { ZodError, ZodSchema } from 'zod'
 
 export default (schema: ZodSchema) => (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('Headers:', req.headers)
     console.log('Request body:', req.body)
     const result = schema.parse(req.body)
     console.log('Parsed result:', result)
