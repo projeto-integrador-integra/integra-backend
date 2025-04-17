@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UserRole } from '@/constants/user'
-import { APIGatewayProxyEvent } from 'aws-lambda'
 
 declare global {
   declare namespace Express {
@@ -9,7 +9,7 @@ declare global {
         email: string
         role?: UserRole
       }
-      event?: APIGatewayProxyEvent
+      apiGateway: any
     }
   }
 }
