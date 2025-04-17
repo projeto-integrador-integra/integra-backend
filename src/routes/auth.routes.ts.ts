@@ -7,8 +7,8 @@ import { Router } from 'express'
 export function createAuthRouter(authController: AuthController): Router {
   const router = Router()
 
-  router.post('/signup', validate(SignInSchema), authController.signUp)
-  router.post('/login', validate(SignUpSchema), authController.signIn)
+  router.post('/signup', validate(SignUpSchema), authController.signUp)
+  router.post('/login', validate(SignInSchema), authController.signIn)
 
   return router
 }
