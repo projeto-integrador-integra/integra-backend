@@ -17,9 +17,7 @@ export function makeAuthController(authService: AuthService): AuthController {
       const { email, password } = SignUpSchema.parse(req.body)
 
       try {
-        console.log('signup', email, password)
         await authService.signUp({ email, password })
-        console.log('signin', email, password)
         const tokens = await authService.signIn({ email, password })
 
         res

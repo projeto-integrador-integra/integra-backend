@@ -59,7 +59,6 @@ export class UserRepository {
       .where(or(...conditions))
       .execute()
 
-    console.log(usersList)
     return { users: usersList.map((user) => new User(user)), total: Number(totalResult.count) }
   }
 }

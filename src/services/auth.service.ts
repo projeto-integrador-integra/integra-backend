@@ -33,8 +33,6 @@ export async function makeAuthService(): Promise<AuthService> {
   return {
     async signUp({ email, password }) {
       try {
-        console.log('antes', email, password)
-
         await cognito.send(
           new SignUpCommand({
             ClientId: load.COGNITO_CLIENT_ID,
@@ -43,7 +41,6 @@ export async function makeAuthService(): Promise<AuthService> {
             UserAttributes: [{ Name: 'email', Value: email }],
           })
         )
-        console.log('meio', email, password)
 
         await cognito.send(
           new AdminConfirmSignUpCommand({
@@ -51,7 +48,6 @@ export async function makeAuthService(): Promise<AuthService> {
             Username: email,
           })
         )
-        console.log('fim', email, password)
       } catch (err: unknown) {
         const message =
           typeof err === 'object' && err !== null && 'message' in err
