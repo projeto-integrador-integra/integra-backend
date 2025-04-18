@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser'
 import Express from 'express'
 import helmet from 'helmet'
 import { initDependencies } from './initDependecies'
@@ -13,6 +14,7 @@ export async function createApp() {
   const app = Express()
   app.use(helmet())
   app.use(Express.json())
+  app.use(cookieParser())
 
   app.use(createAuthRouter(controllers.auth))
 

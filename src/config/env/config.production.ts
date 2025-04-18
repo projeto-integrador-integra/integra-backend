@@ -45,8 +45,6 @@ export async function loadProdEnv() {
     ),
   ])
 
-  console.log('Loaded environment variables from SSM')
-
   return schema.parse({
     DATABASE_URL: dbUrl.Parameter?.Value,
     RESEND_API_KEY: resendApi.Parameter?.Value,

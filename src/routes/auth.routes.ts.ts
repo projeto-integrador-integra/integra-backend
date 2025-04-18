@@ -9,6 +9,8 @@ export function createAuthRouter(authController: AuthController): Router {
 
   router.post('/signup', validate(SignUpSchema), authController.signUp)
   router.post('/login', validate(SignInSchema), authController.signIn)
+  router.post('/logout', authController.signOut)
+  router.post('/refresh', authController.refreshTokens)
 
   return router
 }
