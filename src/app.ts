@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser'
 import Express from 'express'
 import helmet from 'helmet'
+import cors from 'cors'
 import { initDependencies } from './initDependecies'
 import { errorHandler } from './middleware/errorHandler'
 import { requireAuth } from './middleware/requireAuth'
@@ -12,7 +13,8 @@ import { createUserRoutes } from './routes/user.routes'
 export async function createApp() {
   const { controllers, services } = await initDependencies()
   const app = Express()
-  app.use(helmet())
+  app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
+  app.use(helmet({ crossOriginResourcePolicy: false, crossOriginEmbedderPolicy: false }))
   app.use(Express.json())
   app.use(cookieParser())
 
