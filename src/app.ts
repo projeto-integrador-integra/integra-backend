@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser'
+import cors from 'cors'
 import Express from 'express'
 import helmet from 'helmet'
-import cors from 'cors'
 import { initDependencies } from './initDependecies'
 import { errorHandler } from './middleware/errorHandler'
 import { requireAuth } from './middleware/requireAuth'

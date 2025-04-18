@@ -21,7 +21,7 @@ export const handler = async (event: APIGatewayProxyEventV2, context: Context) =
             console.error('[patch] Erro ao converter Buffer para JSON:', e)
           }
         }
-        req.url = ev.rawPath.replace(/^\/(default|prod|stage)?/, '').replace(/^\/api/, '') || '/'
+        req.url = ev.rawPath.replace(/^\/(default|prod|stage)?/, '') || '/'
       },
     })
   }
