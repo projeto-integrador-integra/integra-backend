@@ -1,7 +1,7 @@
 import cookieParser from 'cookie-parser'
-import cors from 'cors'
 import Express from 'express'
 import helmet from 'helmet'
+import cors from 'cors'
 import { initDependencies } from './initDependecies'
 import { errorHandler } from './middleware/errorHandler'
 import { requireAuth } from './middleware/requireAuth'
@@ -13,17 +13,18 @@ import { createUserRoutes } from './routes/user.routes'
 export async function createApp() {
   const { controllers, services } = await initDependencies()
   const app = Express()
+  const api = Express.Router()
   app.use(cors({ origin: 'http://localhost:5173', credentials: true }))
   app.use(helmet({ crossOriginResourcePolicy: false, crossOriginEmbedderPolicy: false }))
   app.use(Express.json())
   app.use(cookieParser())
 
-  app.use(createAuthRouter(controllers.auth))
+  api.use(createAuthRouter(controllers.auth))
+  api.use('/users', requireAuth(services.user), createUserRoutes(controllers.user))
+  api.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.project))
+  api.use('/docs', createDocsRoutes())
 
-  app.use('/users', requireAuth(services.user), createUserRoutes(controllers.user))
-  app.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.project))
-
-  app.use('/docs', createDocsRoutes())
+  app.use('/api', api)
 
   app.use(errorHandler)
 
