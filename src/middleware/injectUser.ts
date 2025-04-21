@@ -5,7 +5,7 @@ export function injectUser() {
   return (req: Request, _res: Response, next?: NextFunction) => {
     req.user = {
       sub: req.headers.sub as string,
-      email: req.headers.email as string,
+      email: req.headers.username as string,
     }
 
     const event = req.apiGateway?.event
@@ -15,7 +15,7 @@ export function injectUser() {
     if (claims?.sub) {
       req.user = {
         sub: claims.sub,
-        email: claims.email,
+        email: claims.username,
       }
     }
 
