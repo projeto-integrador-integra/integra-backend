@@ -15,7 +15,7 @@ export function injectUser() {
     if (claims?.sub) {
       req.user = {
         sub: claims.sub,
-        email: claims.username,
+        email: claims.email ?? claims.username,
       }
     }
 
