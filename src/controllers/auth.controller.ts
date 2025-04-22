@@ -1,3 +1,4 @@
+import { getCookieOptions } from '@/config/cookie'
 import { AppError } from '@/errors/AppErro'
 import { SignInSchema } from '@/models/dto/auth/signin.dto'
 import { SignUpSchema } from '@/models/dto/auth/signup.dto'
@@ -21,18 +22,8 @@ export function makeAuthController(authService: AuthService): AuthController {
         const tokens = await authService.signIn({ email, password })
 
         res
-          .cookie('idToken', tokens.idToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
-          .cookie('accessToken', tokens.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
+          .cookie('idToken', tokens.idToken, getCookieOptions(req))
+          .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
           .status(201)
           .json({ message: 'Usuário criado e logado com sucesso.' })
       } catch (err: unknown) {
@@ -51,18 +42,8 @@ export function makeAuthController(authService: AuthService): AuthController {
         const tokens = await authService.signIn({ email, password })
 
         res
-          .cookie('accessToken', tokens.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
-          .cookie('idToken', tokens.idToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
+          .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
+          .cookie('idToken', tokens.idToken, getCookieOptions(req))
           .json({ message: 'Login realizado com sucesso.' })
       } catch (err: unknown) {
         const message =
@@ -98,18 +79,8 @@ export function makeAuthController(authService: AuthService): AuthController {
         const tokens = await authService.refreshTokens(refreshToken)
 
         res
-          .cookie('accessToken', tokens.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
-          .cookie('idToken', tokens.idToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 1000 * 60 * 60,
-          })
+          .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
+          .cookie('idToken', tokens.idToken, getCookieOptions(req))
           .json({ message: 'Tokens atualizados com sucesso.' })
       } catch (err: unknown) {
         const message =
