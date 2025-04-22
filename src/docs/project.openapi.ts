@@ -20,6 +20,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'post',
     path: '/projects',
+    tags: ['Project'],
     description: 'Cria um novo projeto para que devs iniciantes possam se candidatar.',
     request: {
       body: {
@@ -55,6 +56,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'get',
     path: '/projects',
+    tags: ['Project'],
     description: 'Lista projetos com filtros e paginação (para empresas, devs, mentores e admin).',
     request: {
       query: ProjectsListQuerySchema,
@@ -86,6 +88,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'get',
     path: '/projects/{id}',
+    tags: ['Project'],
     description: 'Retorna os detalhes completos de um projeto específico.',
     request: {
       params: z.object({ id: z.string().uuid() }),
@@ -110,6 +113,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'patch',
     path: '/projects/{id}',
+    tags: ['Project'],
     description:
       'Atualiza informações de um projeto existente. Acesso restrito à empresa criadora ou admin.',
     request: {
@@ -140,6 +144,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'post',
     path: '/projects/{id}/apply',
+    tags: ['Project'],
     description: 'Candidata o usuário autenticado (dev ou mentor) ao projeto especificado.',
     request: {
       params: z.object({ id: z.string().uuid() }),
@@ -173,6 +178,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'get',
     path: '/projects/mine',
+    tags: ['Project'],
     description:
       'Lista os projetos criados pela empresa autenticada, ou os projetos em que o usuário autenticado (dev ou mentor) está participando',
     request: {
@@ -206,6 +212,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'post',
     path: '/projects/{id}/feedback',
+    tags: ['Project'],
     description: 'Permite que devs ou mentores participantes enviem feedback ao final do projeto.',
     request: {
       params: z.object({ id: z.string().uuid() }),
@@ -236,6 +243,7 @@ export function registerProjectDocs() {
   registry.registerPath({
     method: 'get',
     path: '/projects/{id}/feedbacks',
+    tags: ['Project'],
     description:
       'Retorna todos os feedbacks deixados por devs ou mentores para o projeto especificado.',
     request: {

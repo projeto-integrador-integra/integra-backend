@@ -14,6 +14,7 @@ export function registerUserDocs() {
   registry.registerPath({
     method: 'post',
     path: '/users',
+    tags: ['User'],
     description: 'Cria um novo usuário no sistema',
     requestBody: {
       required: true,
@@ -44,6 +45,7 @@ export function registerUserDocs() {
   registry.registerPath({
     method: 'get',
     path: '/users/{id}',
+    tags: ['User'],
     description: 'Buscar dados completos de um usuário',
     request: {
       params: z.object({
@@ -70,6 +72,7 @@ export function registerUserDocs() {
   registry.registerPath({
     method: 'get',
     path: '/users',
+    tags: ['User'],
     description: 'Lista todos os usuários com filtros e paginação (apenas admin).',
     request: {
       query: ListUsersQuerySchema,
@@ -103,6 +106,7 @@ export function registerUserDocs() {
   registry.registerPath({
     method: 'patch',
     path: '/users/{id}',
+    tags: ['User'],
     description: 'Atualiza dados de um usuário (admin)',
     request: {
       params: z.object({
@@ -135,6 +139,7 @@ export function registerUserDocs() {
   registry.registerPath({
     method: 'get',
     path: '/users/me',
+    tags: ['User'],
     description: 'Obtém os dados do próprio usuário autenticado.',
     responses: {
       200: {
