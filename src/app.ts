@@ -9,6 +9,7 @@ import { createAuthRouter } from './routes/auth.routes.ts'
 import { createDocsRoutes } from './routes/docs.routes'
 import { createProjectRoutes } from './routes/project.routes'
 import { createUserRoutes } from './routes/user.routes'
+import { requireAccess } from './middleware/requireAccess'
 
 export async function createApp() {
   const { controllers, services } = await initDependencies()
@@ -20,8 +21,13 @@ export async function createApp() {
   app.use(cookieParser())
 
   api.use(createAuthRouter(controllers.auth))
-  api.use('/users', requireAuth(services.user), createUserRoutes(controllers.user))
-  api.use('/projects', requireAuth(services.user), createProjectRoutes(controllers.project))
+  api.use('/users', requireAuth, createUserRoutes(services.user, controllers.user))
+  api.use(
+    '/projects',
+    requireAuth,
+    requireAccess(services.user),
+    createProjectRoutes(services.user, controllers.project)
+  )
   api.use('/docs', createDocsRoutes())
 
   app.use('/api', api)

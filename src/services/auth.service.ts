@@ -1,11 +1,11 @@
 import {
   AdminConfirmSignUpCommand,
   AdminInitiateAuthCommand,
-  CognitoIdentityProviderClient,
   GlobalSignOutCommand,
   SignUpCommand,
 } from '@aws-sdk/client-cognito-identity-provider'
 
+import { cognitoClient } from '@/config/cognito'
 import { loadEnv } from '@/config/env'
 import { AppError } from '@/errors/AppErro'
 
@@ -26,14 +26,11 @@ export interface AuthService {
 
 export async function makeAuthService(): Promise<AuthService> {
   const load = await loadEnv()
-  const cognito = new CognitoIdentityProviderClient({
-    region: 'us-east-1',
-  })
 
   return {
     async signUp({ email, password }) {
       try {
-        await cognito.send(
+        await cognitoClient.send(
           new SignUpCommand({
             ClientId: load.COGNITO_CLIENT_ID,
             Username: email,
@@ -42,7 +39,7 @@ export async function makeAuthService(): Promise<AuthService> {
           })
         )
 
-        await cognito.send(
+        await cognitoClient.send(
           new AdminConfirmSignUpCommand({
             UserPoolId: load.COGNITO_USER_POOL_ID,
             Username: email,
@@ -59,7 +56,7 @@ export async function makeAuthService(): Promise<AuthService> {
 
     async signIn({ email, password }) {
       try {
-        const response = await cognito.send(
+        const response = await cognitoClient.send(
           new AdminInitiateAuthCommand({
             UserPoolId: load.COGNITO_USER_POOL_ID,
             ClientId: load.COGNITO_CLIENT_ID,
@@ -93,7 +90,7 @@ export async function makeAuthService(): Promise<AuthService> {
 
     async signOut(token) {
       try {
-        await cognito.send(new GlobalSignOutCommand({ AccessToken: token }))
+        await cognitoClient.send(new GlobalSignOutCommand({ AccessToken: token }))
       } catch (err: unknown) {
         const message =
           typeof err === 'object' && err !== null && 'message' in err
@@ -105,7 +102,7 @@ export async function makeAuthService(): Promise<AuthService> {
 
     async refreshTokens(refreshToken) {
       try {
-        const response = await cognito.send(
+        const response = await cognitoClient.send(
           new AdminInitiateAuthCommand({
             UserPoolId: load.COGNITO_USER_POOL_ID,
             ClientId: load.COGNITO_CLIENT_ID,

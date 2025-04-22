@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { UserRole } from '@/constants/user'
+import { User } from '@/models/domain/user'
 
 declare global {
   declare namespace Express {
@@ -7,8 +7,7 @@ declare global {
       user: {
         sub: string
         email: string
-        role?: UserRole
-      }
+      } & Partial<User>
       apiGateway: any
     }
   }
