@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { User } from '@/models/domain/user'
 import { users } from '@/models/schema/user'
 import { count, desc, eq, ilike, or } from 'drizzle-orm'
-import { ListUsersQuery } from '@/models/dto/user/list.dto'
+import { ListUsersQueryType } from '@/models/dto/user/list.dto'
 
 export class UserRepository {
   constructor(private readonly db: ReturnType<typeof drizzle>) {}
@@ -31,7 +31,7 @@ export class UserRepository {
     return user ? new User(user) : null
   }
 
-  async findAllWithFilters(query: ListUsersQuery): Promise<{ users: User[]; total: number }> {
+  async findAllWithFilters(query: ListUsersQueryType): Promise<{ users: User[]; total: number }> {
     const { limit, page } = query
     const conditions = []
     if (query.role) {

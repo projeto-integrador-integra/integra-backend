@@ -8,4 +8,4 @@ export const ProjectApplySchema = z.object({
     .transform((val) => (val?.trim() === '' ? undefined : val)),
 })
 
-export type ProjectApplyDTO = z.infer<typeof ProjectApplySchema>
+export type ProjectApplyType = z.infer<typeof ProjectApplySchema>

@@ -10,4 +10,4 @@ export const ProjectsListQuerySchema = z.object({
   limit: z.string().default('10').transform(Number),
 })
 
-export type ProjectsListQuery = z.infer<typeof ProjectsListQuerySchema>
+export type ProjectsListQueryType = z.infer<typeof ProjectsListQuerySchema>

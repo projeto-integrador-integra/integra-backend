@@ -1,6 +1,6 @@
 import { AppError } from '@/errors/AppErro'
 import { User } from '@/models/domain/user'
-import { ListUsersQuery } from '@/models/dto/user/list.dto'
+import { ListUsersQueryType } from '@/models/dto/user/list.dto'
 import { UserType } from '@/models/dto/user/user.dto'
 import { UserRepository } from '@/repositories/user.repository'
 
@@ -34,7 +34,7 @@ export class UserService {
     return user
   }
 
-  async list(query: ListUsersQuery): Promise<{ users: User[]; total: number }> {
+  async list(query: ListUsersQueryType): Promise<{ users: User[]; total: number }> {
     const users = await this.userRepository.findAllWithFilters(query)
     return users
   }

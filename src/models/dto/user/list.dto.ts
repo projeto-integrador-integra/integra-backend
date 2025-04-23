@@ -8,4 +8,4 @@ export const ListUsersQuerySchema = z.object({
   limit: z.string().transform(Number).default('10'),
 })
 
-export type ListUsersQuery = z.infer<typeof ListUsersQuerySchema>
+export type ListUsersQueryType = z.infer<typeof ListUsersQuerySchema>
