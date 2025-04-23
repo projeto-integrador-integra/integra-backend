@@ -16,7 +16,11 @@ function getJwksClient(jwksUri: string) {
 export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const token = req.cookies?.idToken
   if (!token) {
-    throw new AppError('Token não encontrado.', 401, 'UNAUTHORIZED')
+    throw new AppError(
+      'Seu token de autenticação é inválido ou expirou. Faça login novamente',
+      401,
+      'INVALID_TOKEN'
+    )
   }
 
   const env = await loadEnv()
@@ -34,7 +38,11 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
 
   jwt.verify(token, getKey, { issuer }, (err, decoded) => {
     if (err || !decoded || typeof decoded !== 'object') {
-      throw new AppError('Token inválido.', 401, 'UNAUTHORIZED')
+      throw new AppError(
+        'Seu token de autenticação é inválido ou expirou. Faça login novamente',
+        401,
+        'INVALID_TOKEN'
+      )
     }
 
     const payload = decoded as JwtPayload & {
@@ -43,7 +51,11 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
     }
 
     if (!payload.sub || (!payload.email && !payload.username)) {
-      throw new AppError('Missing user sub or email', 401, 'UNAUTHORIZED')
+      throw new AppError(
+        'Seu token de autenticação é inválido ou expirou. Faça login novamente',
+        401,
+        'INVALID_TOKEN'
+      )
     }
 
     req.user = {
