@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { User } from '@/models/domain/user'
 import { users } from '@/models/schema/user'
-import { count, desc, eq, ilike, or } from 'drizzle-orm'
+import { and, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { ListUsersQueryType } from '@/models/dto/user/list.dto'
 
 export class UserRepository {
@@ -55,13 +55,13 @@ export class UserRepository {
       .limit(limit)
       .offset((page - 1) * limit)
       .orderBy(desc(users.createdAt))
-      .where(or(...conditions))
+      .where(and(...conditions))
       .execute()
 
     const [totalResult] = await this.db
       .select({ count: count() })
       .from(users)
-      .where(or(...conditions))
+      .where(and(...conditions))
       .execute()
 
     return { users: usersList.map((user) => new User(user)), total: Number(totalResult.count) }
