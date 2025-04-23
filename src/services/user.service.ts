@@ -29,6 +29,11 @@ export class UserService {
     return user
   }
 
+  async getByEmail(email: string): Promise<User | null> {
+    const user = await this.userRepository.getByEmail(email)
+    return user
+  }
+
   async getByEmailOrSub(email: string, sub: string): Promise<User | null> {
     const user = await this.userRepository.getByEmailOrSub(email, sub)
     return user

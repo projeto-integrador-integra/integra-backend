@@ -48,19 +48,11 @@ export function makeUserController(userService: UserService): UserController {
     },
 
     async getCurrentUser(req: Request, res: Response) {
-      // TODO: Implement get me logic
+      const sub = req.user.sub
+      const user = await userService.getBySub(sub)
+      if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
 
-      res.status(200).json({
-        id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        sub: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        role: 'admin',
-        name: 'string',
-        email: 'user@example.com',
-        description: 'string',
-        createdAt: 'string',
-        updatedAt: 'string',
-        approvalStatus: 'pending',
-      })
+      res.status(200).json(user.toObject())
     },
   }
 }

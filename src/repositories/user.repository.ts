@@ -22,6 +22,11 @@ export class UserRepository {
     return user ? new User(user) : null
   }
 
+  async getByEmail(email: string): Promise<User | null> {
+    const [user] = await this.db.select().from(users).where(eq(users.email, email)).execute()
+    return user ? new User(user) : null
+  }
+
   async getByEmailOrSub(email: string, sub: string): Promise<User | null> {
     const [user] = await this.db
       .select()
