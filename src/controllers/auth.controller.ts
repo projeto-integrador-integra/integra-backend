@@ -1,9 +1,10 @@
+import { Request, Response } from 'express'
+
 import { getCookieOptions } from '@/config/cookie'
 import { AppError } from '@/errors/AppErro'
 import { SignInSchema } from '@/models/dto/auth/signin.dto'
 import { SignUpSchema } from '@/models/dto/auth/signup.dto'
 import { AuthService } from '@/services/auth.service'
-import { Request, Response } from 'express'
 
 export interface AuthController {
   signUp: (req: Request, res: Response) => Promise<void>

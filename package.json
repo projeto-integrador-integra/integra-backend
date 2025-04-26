@@ -17,7 +17,9 @@
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write .",
     "db:seed": "tsx src/seed/index.ts",
-    "package": "bash scripts/package.sh"
+    "package": "bash scripts/package.sh",
+    "email:build": "email build",
+    "email:dev": "email dev --dir=src/emails"
   },
   "lint-staged": {
     "*.{ts,js}": [
@@ -36,6 +38,8 @@
     "@asteasolutions/zod-to-openapi": "^7.3.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.787.0",
     "@aws-sdk/client-ssm": "^3.787.0",
+    "@react-email/components": "^0.0.36",
+    "@react-email/render": "^1.0.6",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -45,6 +49,10 @@
     "jsonwebtoken": "^9.0.2",
     "jwks-rsa": "^3.2.0",
     "pg": "^8.14.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-email": "^4.0.7",
+    "resend": "^4.4.1",
     "swagger-ui-express": "^5.0.1",
     "zod": "^3.24.2"
   },
@@ -59,6 +67,8 @@
     "@types/express": "^5.0.1",
     "@types/node": "^22.14.0",
     "@types/pg": "^8.11.11",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
     "@types/swagger-ui-express": "^4.1.8",
     "drizzle-kit": "^0.30.6",
     "eslint": "^9.24.0",

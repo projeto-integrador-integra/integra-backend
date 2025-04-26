@@ -11,6 +11,7 @@ Back-end do projeto **Integra**, criado com Node.js, Express e Drizzle ORM
 - [Vitest](https://vitest.dev/)
 - [AWS Lambda](https://aws.amazon.com/lambda/)
 - [serverless-http](https://www.npmjs.com/package/serverless-http)
+- [Resend](https://resend.com/)
 
 ## 📁 Estrutura de Pastas
 
@@ -55,4 +56,10 @@ npm run start:dev
 
 ```
 npm run db:push
+```
+
+### 5. Visualizar templates localmente
+
+```
+npm run email:dev
 ```

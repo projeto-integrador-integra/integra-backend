@@ -1,6 +1,8 @@
 import { AppError } from '@/errors/AppErro'
 import { UserCreationSchema } from '@/models/dto/user/create.dto'
 import { ListUsersQuerySchema } from '@/models/dto/user/list.dto'
+import { UserUpdateSchema } from '@/models/dto/user/update.dto'
+import { EmailService } from '@/services/email/email.service'
 import { UserService } from '@/services/user.service'
 import { Request, Response } from 'express'
 
@@ -12,7 +14,10 @@ export interface UserController {
   getCurrentUser: (req: Request, res: Response) => Promise<void>
 }
 
-export function makeUserController(userService: UserService): UserController {
+export function makeUserController(
+  userService: UserService,
+  emailService: EmailService
+): UserController {
   return {
     async createUser(req: Request, res: Response) {
       const data = UserCreationSchema.parse(req.body)
@@ -41,9 +46,23 @@ export function makeUserController(userService: UserService): UserController {
 
     async updateUserById(req: Request, res: Response) {
       // TODO: Implement update user logic
+      const id = req.params?.id
+
+      const user = await userService.getById(id)
+      if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
+
+      const { approvalStatus, name, description, role } = UserUpdateSchema.parse(req.body)
+      if (user.approvalStatus !== 'approved' && approvalStatus === 'approved')
+        emailService.sendWelcomeEmail({ to: user.email, name: name ?? user.name })
+
+      // TODO: Update user in database
 
       res.status(200).json({
-        message: 'User updated successfully',
+        ...user.toObject(),
+        approvalStatus,
+        name,
+        description,
+        role,
       })
     },
 
