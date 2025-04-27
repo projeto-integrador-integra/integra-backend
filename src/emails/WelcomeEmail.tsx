@@ -1,4 +1,3 @@
-// emails/WelcomeEmail.tsx
 import {
   Html,
   Head,

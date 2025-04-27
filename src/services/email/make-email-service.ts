@@ -9,7 +9,7 @@ export async function makeEmailService() {
   const isDev = process.env.NODE_ENV !== 'production'
 
   if (isDev || !load.RESEND_API_KEY) {
-    console.warn('🧪 RESEND_API_KEY não encontrada ou ambiente de dev. Usando FakeEmailService.')
+    console.warn('🧪 Usando FakeEmailService.')
     return new FakeEmailService()
   }
 

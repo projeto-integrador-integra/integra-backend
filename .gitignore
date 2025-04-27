@@ -38,6 +38,7 @@ docker-compose.override.yml
 
 # Lambda build
 build
+lambda
 *.zip
 
 # Drizzle kit
