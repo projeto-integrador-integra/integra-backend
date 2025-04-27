@@ -11,6 +11,10 @@ if [ ! -d dist ]; then
   exit 1
 fi
 
+echo "📂 Copiando templates de emails..."
+mkdir -p dist/emails/templates
+cp -r src/emails/templates/* dist/emails/templates/ || echo "⚠️ Sem templates para copiar."
+
 echo "📁 Criando pasta build..."
 rm -rf build
 mkdir build
