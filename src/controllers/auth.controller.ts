@@ -28,10 +28,7 @@ export function makeAuthController(authService: AuthService): AuthController {
           .status(201)
           .json({ message: 'Usuário criado e logado com sucesso.' })
       } catch (err: unknown) {
-        const message =
-          typeof err === 'object' && err !== null && 'message' in err
-            ? String(err.message)
-            : 'Erro ao criar usuário.'
+        const message = err instanceof AppError ? String(err.message) : 'Erro ao criar usuário.'
         throw new AppError(message, 400, 'SIGNUP_FAILED')
       }
     },
@@ -41,16 +38,14 @@ export function makeAuthController(authService: AuthService): AuthController {
 
       try {
         const tokens = await authService.signIn({ email, password })
+        console.log('Tokens:', tokens)
 
         res
           .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
           .cookie('idToken', tokens.idToken, getCookieOptions(req))
           .json({ message: 'Login realizado com sucesso.' })
       } catch (err: unknown) {
-        const message =
-          typeof err === 'object' && err !== null && 'message' in err
-            ? String(err.message)
-            : 'Erro ao fazer login.'
+        const message = err instanceof AppError ? String(err.message) : 'Erro ao fazer login.'
         throw new AppError(message, 401, 'SIGNIN_FAILED')
       }
     },
@@ -65,10 +60,7 @@ export function makeAuthController(authService: AuthService): AuthController {
           .clearCookie('idToken')
           .json({ message: 'Logout realizado com sucesso.' })
       } catch (err: unknown) {
-        const message =
-          typeof err === 'object' && err !== null && 'message' in err
-            ? String(err.message)
-            : 'Erro ao fazer logout.'
+        const message = err instanceof AppError ? String(err.message) : 'Erro ao fazer logout.'
         throw new AppError(message, 500, 'SIGNOUT_FAILED')
       }
     },
@@ -85,9 +77,7 @@ export function makeAuthController(authService: AuthService): AuthController {
           .json({ message: 'Tokens atualizados com sucesso.' })
       } catch (err: unknown) {
         const message =
-          typeof err === 'object' && err !== null && 'message' in err
-            ? String(err.message)
-            : 'Erro ao atualizar os tokens.'
+          err instanceof AppError ? String(err.message) : 'Erro ao atualizar os tokens.'
         throw new AppError(message, 401, 'REFRESH_TOKEN_FAILED')
       }
     },
