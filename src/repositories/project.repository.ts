@@ -3,7 +3,12 @@ import { projects } from '@/models/schema/projects'
 import { eq } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 
-export class ProjectRepository {
+export interface ProjectRepository {
+  create(project: Project): Promise<Project>
+  getById(id: string): Promise<Project | null>
+}
+
+export class DrizzleProjectRepository implements ProjectRepository {
   constructor(private readonly db: ReturnType<typeof drizzle>) {}
 
   async create(project: Project): Promise<Project> {

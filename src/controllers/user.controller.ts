@@ -34,8 +34,9 @@ export function makeUserController(
     },
 
     async listUsers(req: Request, res: Response) {
-      const query = ListUsersQuerySchema.parse(req.query)
+      const query = ListUsersQuerySchema.parse(req.query ?? {})
       const usersList = await userService.list(query)
+
       res.status(200).json({
         users: usersList.users.map((user) => user.toObject()),
         total: usersList.total,

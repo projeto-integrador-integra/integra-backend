@@ -11,5 +11,6 @@ export const ProjectUpdateSchema = ProjectSchema.partial().omit({
   updatedAt: true,
   needsMentors: true,
   needsDevs: true,
+  members: true,
 })
 export type ProjectUpdateType = z.infer<typeof ProjectUpdateSchema>

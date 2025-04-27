@@ -36,9 +36,9 @@ export class Project implements Serializable {
     this.members = members
   }
 
-  static fromObject(data: Record<string, unknown>) {
+  static fromObject(data: Record<string, unknown>, members: User[] = []): Project {
     const parsed = ProjectSchema.parse(data)
-    return new Project(parsed)
+    return new Project(parsed, members)
   }
 
   toObject() {

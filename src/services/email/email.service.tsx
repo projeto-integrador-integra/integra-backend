@@ -8,7 +8,7 @@ export interface EmailService {
   sendWelcomeEmail: (input: { to: string; name: string }) => Promise<void>
 }
 
-export class ResendService implements EmailService {
+export class ResendEmailService implements EmailService {
   private resend: Resend
 
   constructor(apiKey: string) {

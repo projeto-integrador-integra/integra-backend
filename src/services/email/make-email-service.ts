@@ -1,6 +1,6 @@
 // src/services/email/make-email-service.ts
 
-import { ResendService } from './email.service'
+import { ResendEmailService } from './email.service'
 import { FakeEmailService } from './fake-email.service'
 import { loadEnv } from '@/config/env'
 
@@ -13,5 +13,5 @@ export async function makeEmailService() {
     return new FakeEmailService()
   }
 
-  return new ResendService(load.RESEND_API_KEY)
+  return new ResendEmailService(load.RESEND_API_KEY)
 }

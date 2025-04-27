@@ -32,40 +32,13 @@ export function registerUserDocs() {
         content: {
           'application/json': {
             schema: {
-              $ref: '#/components/schemas/UserCreation',
+              $ref: '#/components/schemas/User',
             },
           },
         },
       },
       400: { description: 'Erro de validação nos dados enviados' },
       409: { description: 'Usuário com esse e-mail já existe' },
-    },
-  })
-
-  registry.registerPath({
-    method: 'get',
-    path: '/users/{id}',
-    tags: ['User'],
-    description: 'Buscar dados completos de um usuário',
-    request: {
-      params: z.object({
-        id: z.string().uuid(),
-      }),
-    },
-    responses: {
-      200: {
-        description: 'Dados completos do usuário',
-        content: {
-          'application/json': {
-            schema: {
-              $ref: '#/components/schemas/User',
-            },
-          },
-        },
-      },
-      404: {
-        description: 'Usuário não encontrado',
-      },
     },
   })
 
@@ -99,6 +72,33 @@ export function registerUserDocs() {
       },
       403: {
         description: 'Acesso negado para usuários não-admin',
+      },
+    },
+  })
+
+  registry.registerPath({
+    method: 'get',
+    path: '/users/{id}',
+    tags: ['User'],
+    description: 'Buscar dados completos de um usuário',
+    request: {
+      params: z.object({
+        id: z.string().uuid(),
+      }),
+    },
+    responses: {
+      200: {
+        description: 'Dados completos do usuário',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/User',
+            },
+          },
+        },
+      },
+      404: {
+        description: 'Usuário não encontrado',
       },
     },
   })

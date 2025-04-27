@@ -1,6 +1,8 @@
-import { z } from 'zod'
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+import { z } from 'zod'
+
 import { PROJECT_APPROVAL_STATUSES, PROJECT_STATUS } from '@/constants/project'
+import { UserSchema } from '../user/user.dto'
 
 extendZodWithOpenApi(z)
 
@@ -17,6 +19,7 @@ export const ProjectSchema = z.object({
   approvalStatus: z.enum(PROJECT_APPROVAL_STATUSES).default('pending'),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
+  members: z.array(UserSchema).optional(),
 })
 
 export type ProjectType = z.infer<typeof ProjectSchema>

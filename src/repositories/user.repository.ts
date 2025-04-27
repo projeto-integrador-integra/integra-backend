@@ -4,7 +4,16 @@ import { users } from '@/models/schema/user'
 import { and, count, desc, eq, ilike, or } from 'drizzle-orm'
 import { ListUsersQueryType } from '@/models/dto/user/list.dto'
 
-export class UserRepository {
+export interface UserRepository {
+  create(user: User): Promise<User>
+  getById(id: string): Promise<User | null>
+  getBySub(sub: string): Promise<User | null>
+  getByEmail(email: string): Promise<User | null>
+  getByEmailOrSub(email: string, sub: string): Promise<User | null>
+  findAllWithFilters(query: ListUsersQueryType): Promise<{ users: User[]; total: number }>
+}
+
+export class DrizzleUserRepository implements UserRepository {
   constructor(private readonly db: ReturnType<typeof drizzle>) {}
 
   async create(user: User): Promise<User> {

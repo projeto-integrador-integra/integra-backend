@@ -38,11 +38,7 @@ export function registerProjectDocs() {
         content: {
           'application/json': {
             schema: {
-              type: 'object',
-              properties: {
-                id: { type: 'string' },
-                message: { type: 'string' },
-              },
+              $ref: '#/components/schemas/Project',
             },
           },
         },
@@ -162,6 +158,13 @@ export function registerProjectDocs() {
     responses: {
       201: {
         description: 'Candidatura registrada com sucesso',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/Project',
+            },
+          },
+        },
       },
       400: {
         description: 'Você já se candidatou a este projeto',
@@ -230,6 +233,13 @@ export function registerProjectDocs() {
     responses: {
       201: {
         description: 'Feedback enviado com sucesso',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/FeedbackSchema',
+            },
+          },
+        },
       },
       403: {
         description: 'Acesso negado (usuário não participou do projeto)',
