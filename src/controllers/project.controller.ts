@@ -23,17 +23,20 @@ export function makeProjectController(
 ): ProjectController {
   return {
     async createProject(req: Request, res: Response) {
-      // TODO
-
       const creator = await userService.getBySub(req.user.sub)
       if (!creator) throw new AppError('User not found', 404)
       const body = ProjectCreationSchema.parse(req.body)
       const project = Project.fromObject({ ...body, creatorId: creator.id })
+      // TODO verificar se o projeto já existe
+      // TODO verificar se o usuário já tem um projeto com o mesmo nome
+      // TODO salvar o projeto no banco de dados
+      // TODO limitar 3 projetos por usuário
 
       res.status(201).json(project.toObject())
     },
     async listProjects(req: Request, res: Response) {
-      // TODO
+      // TODO validar req.query
+      // TODO listar projetos
 
       res.status(200).json({
         projects: [
@@ -59,9 +62,10 @@ export function makeProjectController(
       })
     },
     async getProjectById(req: Request, res: Response) {
-      // TODO
       const id = req.params?.id
 
+      // TODO verificar se o projeto existe
+      // TODO retornar projeto com os membros
       res.status(200).json({
         id,
         name: 'depereo eum ab',
@@ -79,8 +83,11 @@ export function makeProjectController(
       })
     },
     async updateProjectById(req: Request, res: Response) {
+      // TODO: Validar o body
       // TODO: Verificar se o projeto existe
       // TODO: Se for company verificar se o usuário é o dono do projeto
+      // TODO Update o projeto no banco de dados
+
       const id = req.params?.id
 
       res.status(200).json({
@@ -100,7 +107,14 @@ export function makeProjectController(
       })
     },
     async applyToProject(req: Request, res: Response) {
-      // TODO
+      // TODO verificar se o projeto existe
+      // TODO verificar se o projeto está aprovado pelos admins
+      // TODO verificar se o usuário já aplicou para outro projeto e está em andamento/análise
+      // TODO verificar se o usuário já está no projeto
+      // TODO se for mentor verificar se já existe um mentor no projeto
+      // TODO se for dev, verificar se já atingiu o número máximo de devs
+      // TODO se for o ultimo dev, enviar email para todos os devs/mentores do projeto
+
       const id = req.params?.id
 
       res.status(201).json({
@@ -132,7 +146,8 @@ export function makeProjectController(
       })
     },
     async getUserProjects(req: Request, res: Response) {
-      // TODO
+      // TODO buscar projetos do usuário
+
       res.status(200).json({
         projects: [
           {
@@ -169,7 +184,11 @@ export function makeProjectController(
       })
     },
     async submitFeedback(req: Request, res: Response) {
-      // TODO
+      // TODO validar o body
+      // TODO verificar se o projeto existe
+      // TODO verificar se o usuário já está no projeto
+      // TODO verificar se o usuário já enviou feedback para o projeto
+
       const id = req.params?.id
 
       res.status(201).json({
@@ -188,7 +207,8 @@ export function makeProjectController(
       })
     },
     async getProjectFeedbacks(req: Request, res: Response) {
-      // TODO
+      // TODO buscar no banco de dados os feedbacks do projeto
+
       res.status(200).json({
         feedbacks: [
           {
