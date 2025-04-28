@@ -24,7 +24,7 @@ export class ResendEmailService implements EmailService {
   constructor(apiKey: string) {
     this.resend = new Resend(apiKey)
     this.templates = {
-      welcome: this.loadTemplate('../../emails/templates/welcome.html'),
+      welcome: this.loadTemplate('../../emails-templates/welcome.html'),
     }
   }
 
@@ -54,11 +54,16 @@ export class ResendEmailService implements EmailService {
 
     const personalizedHtml = this.templates.welcome.replace('{{name}}', formattedName)
 
-    await this.sendEmail({
-      to,
-      subject: `Bem-vindo(a) ao Integra! ${formattedName}`,
-      html: personalizedHtml,
-      text: `Olá ${formattedName}, seja bem-vindo(a) ao Integra! Acesse: https://integra.charmbyte.dev/login`,
-    })
+    try {
+      await this.sendEmail({
+        to,
+        subject: `Bem-vindo(a) ao Integra! ${formattedName}`,
+        html: personalizedHtml,
+        text: `Olá ${formattedName}, seja bem-vindo(a) ao Integra! Acesse: https://integra.charmbyte.dev/login`,
+      })
+    } catch (error) {
+      console.error('Erro ao enviar email de boas-vindas:', error)
+      throw new Error('Erro interno ao enviar email de boas-vindas.')
+    }
   }
 }

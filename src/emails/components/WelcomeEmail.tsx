@@ -18,7 +18,7 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
   return (
     <Html>
       <Head />
-      <Preview>Bem-vindo(a) ao Integra! Vamos começar?</Preview>
+      <Preview>Bem-vindo(a) ao Integra! Vamos começar????</Preview>
       <Body style={{ backgroundColor: '#f9f9f9', padding: '20px' }}>
         <Container style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '8px' }}>
           <Heading style={{ marginBottom: '20px' }}>Bem-vindo(a), {name}!</Heading>
@@ -44,3 +44,4 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
 }
 
 export default WelcomeEmail
+WelcomeEmail.requiredProps = ['name']

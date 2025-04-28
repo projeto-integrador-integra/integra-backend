@@ -54,9 +54,9 @@ export function makeUserController(
 
       const { approvalStatus, name, description, role } = UserUpdateSchema.parse(req.body)
       if (user.approvalStatus !== 'approved' && approvalStatus === 'approved')
-        emailService.sendWelcomeEmail({ to: user.email, name: name ?? user.name })
+        await emailService.sendWelcomeEmail({ to: user.email, name: name ?? user.name })
 
-      // TODO: Update user in database
+      // TODO: Update user in database and return updated user
 
       res.status(200).json({
         ...user.toObject(),

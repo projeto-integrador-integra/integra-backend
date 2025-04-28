@@ -23,7 +23,7 @@
     "watch:emails": "chokidar \"src/emails/**/*\" \"!src/emails/templates/**/*\"  -c \"npm run email:generate\"",
     "email:generate": "tsx src/scripts/generate-emails.tsx",
     "email:build": "email build",
-    "email:dev": "email dev --dir=src/emails"
+    "email:dev": "concurrently -k -n EMAIL,APP -c blue,green \"npm run watch:emails\" \"email dev --dir=src/emails/components\""
   },
   "lint-staged": {
     "*.{ts,js}": [

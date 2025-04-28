@@ -58,8 +58,12 @@ npm run start:dev
 npm run db:push
 ```
 
-### 5. Visualizar templates localmente
+---
 
-```
-npm run email:dev
-```
+## 📧 Emails
+
+Os templates de email são gerenciados separadamente.
+
+Para saber como criar, gerar e testar templates de email, veja:
+
+- [src/emails/README.md](./src/emails/README.md)
