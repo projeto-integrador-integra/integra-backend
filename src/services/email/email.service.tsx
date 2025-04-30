@@ -24,7 +24,7 @@ export class ResendEmailService implements EmailService {
   constructor(apiKey: string) {
     this.resend = new Resend(apiKey)
     this.templates = {
-      welcome: this.loadTemplate('../../emails-templates/welcome.html'),
+      welcome: this.loadTemplate('../../emails/templates/welcome.html'),
     }
   }
 
