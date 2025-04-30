@@ -22,10 +22,10 @@ export class Project implements Serializable {
     const parsed = ProjectSchema.parse(data)
 
     this.id = parsed.id ?? randomUUID()
-    this.name = parsed.name
-    this.description = parsed.description
+    this.name = parsed.name?.trim()
+    this.description = parsed.description?.trim()
     this.creatorId = parsed.creatorId
-    this.tags = parsed.tags
+    this.tags = parsed.tags?.map((tag) => tag.trim())
     this.needsMentors = parsed.needsMentors
     this.needsDevs = parsed.needsDevs
     this.maxParticipants = parsed.maxParticipants
