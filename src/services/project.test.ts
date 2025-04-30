@@ -46,10 +46,11 @@ describe('ProjectService.register', () => {
   })
 
   it('lança erro se usuário já tem 3 projetos', async () => {
-    await Array.from({ length: MAX_PROJECTS_PER_USER }, async () => {
-      const project = Project.fromObject({ ...data, name: faker.person.firstName() })
-      await service.register(project)
-    })
+    await Promise.all(
+      Array.from({ length: MAX_PROJECTS_PER_USER }, () =>
+        service.register(Project.fromObject({ ...data, name: faker.person.firstName() }))
+      )
+    )
 
     const project3 = Project.fromObject({ ...data, name: faker.person.firstName() })
 
