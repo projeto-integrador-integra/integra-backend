@@ -25,13 +25,13 @@ export function makeProjectController(
     async createProject(req: Request, res: Response) {
       const creator = await userService.getBySub(req.user.sub)
       if (!creator) throw new AppError('User not found', 404)
-      const body = ProjectCreationSchema.parse(req.body)
-      const project = Project.fromObject({ ...body, creatorId: creator.id })
-      // TODO verificar se o projeto já existe
-      // TODO verificar se o usuário já tem um projeto com o mesmo nome
-      // TODO salvar o projeto no banco de dados
-      // TODO limitar 3 projetos por usuário
-
+      const { success, error, data } = ProjectCreationSchema.safeParse(req.body)
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
+      const project = Project.fromObject({ ...data, creatorId: creator.id })
+      await projectService.register(project)
       res.status(201).json(project.toObject())
     },
     async listProjects(req: Request, res: Response) {

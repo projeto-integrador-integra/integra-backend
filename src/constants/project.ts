@@ -1,4 +1,4 @@
-export const PROJECT_STATUS = ['active', 'completed', 'archived'] as const
+export const PROJECT_STATUS = ['draft', 'active', 'closed', 'cancelled'] as const
 export const PROJECT_APPROVAL_STATUSES = ['pending', 'approved', 'rejected'] as const
 
 export type ProjectStatus = (typeof PROJECT_STATUS)[number]
