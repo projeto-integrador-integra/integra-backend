@@ -1,7 +1,7 @@
 import { Project } from '@/models/domain/project'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
 import { projects } from '@/models/schema/projects'
-import { and, eq, ilike } from 'drizzle-orm'
+import { and, count, eq, ilike } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 
 export interface ProjectRepository {
@@ -46,9 +46,14 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .limit(limit)
       .offset(offset)
 
+    const [total] = await this.db
+      .select({ count: count() })
+      .from(projects)
+      .where(and(...query))
+
     return {
       projects: list.map((project) => Project.fromObject(project)),
-      total: list.length,
+      total: total.count,
     }
   }
 
