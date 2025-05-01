@@ -7,7 +7,9 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 export interface ProjectRepository {
   create(project: Project): Promise<Project>
   getById(id: string): Promise<Project | null>
-  listProjects(params: ProjectsListQueryType): Promise<{ projects: Project[]; total: number }>
+  listProjects(
+    params?: ProjectsListQueryType
+  ): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   findSimilarProject(params: { userId: string; title: string }): Promise<Project[]>
 }
 
@@ -31,13 +33,15 @@ export class DrizzleProjectRepository implements ProjectRepository {
     status,
     title,
     createdBy,
-  }: ProjectsListQueryType): Promise<{ projects: Project[]; total: number }> {
+    approvalStatus,
+  }: ProjectsListQueryType) {
     const offset = (page - 1) * limit
 
     const query = []
     if (status) query.push(eq(projects.status, status))
     if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
+    if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
 
     const list = await this.db
       .select()
@@ -54,6 +58,8 @@ export class DrizzleProjectRepository implements ProjectRepository {
     return {
       projects: list.map((project) => Project.fromObject(project)),
       total: total.count,
+      page,
+      limit,
     }
   }
 

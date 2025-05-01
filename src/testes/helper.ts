@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker'
 import { randomUUID } from 'node:crypto'
 import { expect } from 'vitest'
 
+import { Project } from '@/models/domain/project'
 import { User } from '@/models/domain/user'
 
 export function expectUuid() {
@@ -24,13 +25,13 @@ export function createFakeUser(role: 'admin' | 'company' | 'dev' | 'mentor' = 'a
   })
 }
 
-export function createFakeProjectInfo() {
+export function createFakeProjectInfo(data: Partial<Project> = {}) {
   return {
-    name: faker.lorem.words(3),
-    description: faker.lorem.sentence(),
-    tags: [faker.lorem.word()],
-    maxParticipants: 5,
-    approvalStatus: 'approved',
-    creatorId: randomUUID(),
+    name: data.name ?? faker.lorem.words(3),
+    description: data.description ?? faker.lorem.sentence(),
+    tags: data.tags ?? [faker.lorem.word()],
+    maxParticipants: data.maxParticipants ?? 5,
+    approvalStatus: data.approvalStatus ?? 'pending',
+    creatorId: data.creatorId ?? randomUUID(),
   }
 }
