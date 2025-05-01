@@ -2,6 +2,7 @@ import { getDb } from './config/drizzle'
 import { makeAuthController } from './controllers/auth.controller'
 import { makeProjectController } from './controllers/project.controller'
 import { makeUserController } from './controllers/user.controller'
+import { DrizzleProjectParticipantRepository } from './repositories/project-participant.repository'
 import { DrizzleProjectRepository } from './repositories/project.repository'
 import { DrizzleUserRepository } from './repositories/user.repository'
 import { makeAuthService } from './services/auth/make-auth-service'
@@ -16,8 +17,13 @@ export async function initDependencies() {
   const userRepository = new DrizzleUserRepository(db)
   const userService = new UserService(userRepository)
   const userController = makeUserController(userService, emailService)
+  const participantRepository = new DrizzleProjectParticipantRepository(db)
   const projectRepository = new DrizzleProjectRepository(db)
-  const projectService = new ProjectService(projectRepository)
+  const projectService = new ProjectService(
+    projectRepository,
+    participantRepository,
+    userRepository
+  )
   const projectController = makeProjectController(projectService, userService)
   const authService = await makeAuthService()
   const authController = makeAuthController(authService)

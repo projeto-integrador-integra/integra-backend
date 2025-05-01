@@ -33,7 +33,7 @@ export function makeProjectController(
       res.status(201).json(project.toObject())
     },
     async listProjects(req: Request, res: Response) {
-      const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query)
+      const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query ?? {})
       if (!success) return res.status(422).json({ errors: error.flatten() })
       const filters = { ...data }
 
@@ -42,12 +42,16 @@ export function makeProjectController(
         if (!user) throw new AppError('User not found', 404, 'NOT_FOUND')
         filters.createdBy = user.id
       } else if (req.user.role !== 'admin') {
-        filters.status = 'active'
         filters.approvalStatus = 'approved'
       }
 
       const projects = await projectService.list(filters)
-      res.status(200).json(projects)
+      res.status(200).json({
+        projects: projects.projects.map((project) => project.toObject()),
+        total: projects.total,
+        page: projects.page,
+        limit: projects.limit,
+      })
     },
     async getProjectById(req: Request, res: Response) {
       const id = req.params?.id

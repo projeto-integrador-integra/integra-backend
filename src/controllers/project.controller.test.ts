@@ -9,11 +9,13 @@ import { UserService } from '@/services/user.service'
 import { createFakeProjectInfo, createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
 import { makeProjectController } from './project.controller'
+import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 
-const projectRepository = new FakeProjectRepository()
-const projectService = new ProjectService(projectRepository)
+const participantRepository = new FakeProjectParticipantRepository()
 const userRepository = new FakeUserRepository()
 const userService = new UserService(userRepository)
+const projectRepository = new FakeProjectRepository()
+const projectService = new ProjectService(projectRepository, participantRepository, userRepository)
 const controller = makeProjectController(projectService, userService)
 
 const admin = createFakeUser('admin')
@@ -223,7 +225,7 @@ describe('ProjectController - Role-Based Listing', () => {
     await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
     await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
 
-    const req = { user: admin, query: { page: 1, limit: 10 } } as unknown as Request
+    const req = { user: admin, query: { page: '1', limit: '10' } } as unknown as Request
 
     await controller.listProjects(req, res)
 
@@ -239,7 +241,7 @@ describe('ProjectController - Role-Based Listing', () => {
       Project.fromObject(createFakeProjectInfo({ creatorId: company.id }))
     )
 
-    const req = { user: company, query: { page: 1, limit: 10 } } as unknown as Request
+    const req = { user: company, query: { page: '1', limit: '10' } } as unknown as Request
 
     await controller.listProjects(req, res)
 
@@ -255,7 +257,7 @@ describe('ProjectController - Role-Based Listing', () => {
       Project.fromObject(createFakeProjectInfo({ approvalStatus: 'approved', status: 'active' }))
     )
 
-    const req = { user: dev, query: { page: 1, limit: 10 } } as unknown as Request
+    const req = { user: dev, query: { page: '1', limit: '10' } } as unknown as Request
 
     await controller.listProjects(req, res)
 
