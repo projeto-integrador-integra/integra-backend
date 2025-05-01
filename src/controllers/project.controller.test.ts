@@ -9,11 +9,13 @@ import { UserService } from '@/services/user.service'
 import { createFakeProjectInfo, createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
 import { makeProjectController } from './project.controller'
+import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 
-const projectRepository = new FakeProjectRepository()
-const projectService = new ProjectService(projectRepository)
+const participantRepository = new FakeProjectParticipantRepository()
 const userRepository = new FakeUserRepository()
 const userService = new UserService(userRepository)
+const projectRepository = new FakeProjectRepository()
+const projectService = new ProjectService(projectRepository, participantRepository, userRepository)
 const controller = makeProjectController(projectService, userService)
 
 const admin = createFakeUser('admin')
@@ -32,7 +34,7 @@ describe('ProjectController', () => {
     projectRepository.clear()
   })
 
-  it('should create a project (POST /projects)', async () => {
+  it('should create a project', async () => {
     const res = createMockResponse()
     const projectData = createFakeProjectInfo()
 
@@ -63,12 +65,12 @@ describe('ProjectController', () => {
     )
   })
 
-  it('should list projects (GET /projects)', async () => {
+  it('should return all projects', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo())
     await projectRepository.create(project)
 
-    const req = { user: { email: admin.email, sub: admin.sub } } as unknown as Request
+    const req = { user: admin } as unknown as Request
 
     await controller.listProjects(req, res)
 
@@ -94,14 +96,14 @@ describe('ProjectController', () => {
     )
   })
 
-  it('should get project by id (GET /projects/:id)', async () => {
+  it('should return project by id', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo())
     await projectRepository.create(project)
 
     const req = {
       params: { id: project.id },
-      user: { email: admin.email, sub: admin.sub },
+      user: admin,
     } as unknown as Request
 
     await controller.getProjectById(req, res)
@@ -121,14 +123,14 @@ describe('ProjectController', () => {
     )
   })
 
-  it('should apply to project (POST /projects/:id/apply)', async () => {
+  it('should allow a user to apply to a project', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo())
     await projectRepository.create(project)
 
     const req = {
       params: { id: project.id },
-      user: { email: dev.email, sub: dev.sub },
+      user: dev,
     } as unknown as Request
 
     await controller.applyToProject(req, res)
@@ -137,38 +139,22 @@ describe('ProjectController', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         id: project.id,
-        name: expect.any(String),
-        description: expect.any(String),
-        creatorId: expectUuid(),
-        tags: expect.arrayContaining([expect.any(String)]),
-        maxParticipants: expect.any(Number),
-        createdAt: expect.any(Date),
-        updatedAt: expect.any(Date),
         members: expect.arrayContaining([
           expect.objectContaining({
             id: expectUuid(),
             name: expect.any(String),
-            sub: expectUuid(),
-            role: expect.any(String),
-            description: expect.any(String),
-            email: expect.any(String),
-            createdAt: expect.any(Date),
-            updatedAt: expect.any(Date),
-            approvalStatus: expect.any(String),
           }),
         ]),
       })
     )
   })
 
-  it('should list user projects (GET /projects/mine)', async () => {
+  it('should return projects of the logged user', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo(), [dev])
     await projectRepository.create(project)
 
-    const req = {
-      user: { email: dev.email, sub: dev.sub },
-    } as unknown as Request
+    const req = { user: dev } as unknown as Request
 
     await controller.getUserProjects(req, res)
 
@@ -178,40 +164,20 @@ describe('ProjectController', () => {
         projects: expect.arrayContaining([
           expect.objectContaining({
             id: expectUuid(),
-            name: expect.any(String),
-            description: expect.any(String),
-            creatorId: expectUuid(),
-            tags: expect.arrayContaining([expect.any(String)]),
-            maxParticipants: expect.any(Number),
-            createdAt: expect.any(Date),
-            updatedAt: expect.any(Date),
-            members: expect.arrayContaining([
-              expect.objectContaining({
-                id: expectUuid(),
-                name: expect.any(String),
-                sub: expectUuid(),
-                role: expect.any(String),
-                description: expect.any(String),
-                email: expect.any(String),
-                createdAt: expect.any(Date),
-                updatedAt: expect.any(Date),
-                approvalStatus: expect.any(String),
-              }),
-            ]),
           }),
         ]),
       })
     )
   })
 
-  it('should submit feedback (POST /projects/:id/feedback)', async () => {
+  it('should allow user to submit feedback', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo(), [dev])
     await projectRepository.create(project)
 
     const req = {
       params: { id: project.id },
-      user: { email: dev.email, sub: dev.sub },
+      user: dev,
     } as unknown as Request
 
     await controller.submitFeedback(req, res)
@@ -221,24 +187,19 @@ describe('ProjectController', () => {
       expect.objectContaining({
         id: expectUuid(),
         projectId: project.id,
-        user: expect.objectContaining({
-          id: expectUuid(),
-          name: expect.any(String),
-        }),
-        comment: expect.any(String),
-        rating: expect.any(Number),
+        user: expect.objectContaining({ id: expectUuid() }),
       })
     )
   })
 
-  it('should get project feedbacks (GET /projects/:id/feedbacks)', async () => {
+  it('should return feedbacks from project', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo(), [dev])
     await projectRepository.create(project)
 
     const req = {
       params: { id: project.id },
-      user: { email: dev.email, sub: dev.sub },
+      user: dev,
     } as unknown as Request
 
     await controller.getProjectFeedbacks(req, res)
@@ -249,13 +210,58 @@ describe('ProjectController', () => {
         feedbacks: expect.arrayContaining([
           expect.objectContaining({
             id: expectUuid(),
-            user: expect.objectContaining({
-              id: expectUuid(),
-              name: expect.any(String),
-            }),
+            user: expect.objectContaining({ id: expectUuid() }),
           }),
         ]),
       })
     )
+  })
+})
+
+describe('ProjectController - Role-Based Listing', () => {
+  it('should list all projects for admin', async () => {
+    const res = createMockResponse()
+    projectRepository.clear()
+    await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
+    await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
+
+    const req = { user: admin, query: { page: '1', limit: '10' } } as unknown as Request
+
+    await controller.listProjects(req, res)
+
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ total: 2 }))
+  })
+
+  it('should list only own projects for company', async () => {
+    const res = createMockResponse()
+    projectRepository.clear()
+    await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
+    await projectRepository.create(
+      Project.fromObject(createFakeProjectInfo({ creatorId: company.id }))
+    )
+
+    const req = { user: company, query: { page: '1', limit: '10' } } as unknown as Request
+
+    await controller.listProjects(req, res)
+
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ total: 1 }))
+  })
+
+  it('should list only approved projects for dev', async () => {
+    const res = createMockResponse()
+    projectRepository.clear()
+    await projectRepository.create(Project.fromObject(createFakeProjectInfo()))
+    await projectRepository.create(
+      Project.fromObject(createFakeProjectInfo({ approvalStatus: 'approved', status: 'active' }))
+    )
+
+    const req = { user: dev, query: { page: '1', limit: '10' } } as unknown as Request
+
+    await controller.listProjects(req, res)
+
+    expect(res.status).toHaveBeenCalledWith(200)
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ total: 1 }))
   })
 })

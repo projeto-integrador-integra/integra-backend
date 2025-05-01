@@ -12,3 +12,10 @@ export const projectParticipants = pgTable('project_participants', {
     .references(() => projects.id),
   joinedAt: timestamp('joined_at').defaultNow(),
 })
+
+export interface ProjectParticipant {
+  id: string
+  userId: string
+  projectId: string
+  joinedAt: Date | null
+}

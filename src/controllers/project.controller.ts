@@ -3,18 +3,19 @@ import { Request, Response } from 'express'
 import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
 import { ProjectCreationSchema } from '@/models/dto/project/create.dto'
+import { ProjectsListQuerySchema } from '@/models/dto/project/list.dto'
 import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 
 export interface ProjectController {
-  createProject: (req: Request, res: Response) => Promise<void>
-  listProjects: (req: Request, res: Response) => Promise<void>
-  getProjectById: (req: Request, res: Response) => Promise<void>
-  updateProjectById: (req: Request, res: Response) => Promise<void>
-  applyToProject: (req: Request, res: Response) => Promise<void>
-  getUserProjects: (req: Request, res: Response) => Promise<void>
-  submitFeedback: (req: Request, res: Response) => Promise<void>
-  getProjectFeedbacks: (req: Request, res: Response) => Promise<void>
+  createProject: (req: Request, res: Response) => Promise<Response | void>
+  listProjects: (req: Request, res: Response) => Promise<Response | void>
+  getProjectById: (req: Request, res: Response) => Promise<Response | void>
+  updateProjectById: (req: Request, res: Response) => Promise<Response | void>
+  applyToProject: (req: Request, res: Response) => Promise<Response | void>
+  getUserProjects: (req: Request, res: Response) => Promise<Response | void>
+  submitFeedback: (req: Request, res: Response) => Promise<Response | void>
+  getProjectFeedbacks: (req: Request, res: Response) => Promise<Response | void>
 }
 
 export function makeProjectController(
@@ -26,39 +27,30 @@ export function makeProjectController(
       const creator = await userService.getBySub(req.user.sub)
       if (!creator) throw new AppError('User not found', 404)
       const { success, error, data } = ProjectCreationSchema.safeParse(req.body)
-      if (!success) {
-        res.status(422).json({ errors: error.flatten() })
-        return
-      }
+      if (!success) return res.status(422).json({ errors: error.flatten() })
       const project = Project.fromObject({ ...data, creatorId: creator.id })
       await projectService.register(project)
       res.status(201).json(project.toObject())
     },
     async listProjects(req: Request, res: Response) {
-      // TODO validar req.query
-      // TODO listar projetos
+      const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query ?? {})
+      if (!success) return res.status(422).json({ errors: error.flatten() })
+      const filters = { ...data }
 
+      if (req.user.role === 'company') {
+        const user = await userService.getBySub(req.user.sub)
+        if (!user) throw new AppError('User not found', 404, 'NOT_FOUND')
+        filters.createdBy = user.id
+      } else if (req.user.role !== 'admin') {
+        filters.approvalStatus = 'approved'
+      }
+
+      const projects = await projectService.list(filters)
       res.status(200).json({
-        projects: [
-          {
-            id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            name: 'capto sto cotidie',
-            description: 'Auctor quo arcesso aurum socius sub mollitia copiose.',
-            creatorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            tags: ['vir'],
-            needsMentors: true,
-            needsDevs: true,
-            maxParticipants: 3,
-            status: 'active',
-            approvalStatus: 'pending',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            members: [],
-          },
-        ],
-        page: 1,
-        limit: 1,
-        total: 1,
+        projects: projects.projects.map((project) => project.toObject()),
+        total: projects.total,
+        page: projects.page,
+        limit: projects.limit,
       })
     },
     async getProjectById(req: Request, res: Response) {

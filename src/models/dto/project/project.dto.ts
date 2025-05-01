@@ -10,12 +10,12 @@ export const ProjectSchema = z.object({
   id: z.string().uuid({ message: 'ID inválido' }).optional(),
 
   name: z
-    .string()
+    .string({ message: 'O nome do projeto deve ter no mínimo 3 caracteres' })
     .min(3, { message: 'O nome do projeto deve ter no mínimo 3 caracteres' })
     .max(50, { message: 'O nome do projeto deve ter no máximo 50 caracteres' }),
 
   description: z
-    .string()
+    .string({ message: 'A descrição deve ter no mínimo 10 caracteres' })
     .min(10, { message: 'A descrição deve ter no mínimo 10 caracteres' })
     .max(300, { message: 'A descrição deve ter no máximo 300 caracteres' }),
 

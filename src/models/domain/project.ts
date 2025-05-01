@@ -41,6 +41,12 @@ export class Project implements Serializable {
     return new Project(parsed, members)
   }
 
+  addMember(member?: User) {
+    if (!member) return
+    if (this.members.find((m) => m.id === member.id)) return
+    this.members.push(member)
+  }
+
   toObject() {
     return {
       id: this.id,
