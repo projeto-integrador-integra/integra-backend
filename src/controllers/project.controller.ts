@@ -8,14 +8,14 @@ import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 
 export interface ProjectController {
-  createProject: (req: Request, res: Response) => Promise<void>
-  listProjects: (req: Request, res: Response) => Promise<void>
-  getProjectById: (req: Request, res: Response) => Promise<void>
-  updateProjectById: (req: Request, res: Response) => Promise<void>
-  applyToProject: (req: Request, res: Response) => Promise<void>
-  getUserProjects: (req: Request, res: Response) => Promise<void>
-  submitFeedback: (req: Request, res: Response) => Promise<void>
-  getProjectFeedbacks: (req: Request, res: Response) => Promise<void>
+  createProject: (req: Request, res: Response) => Promise<Response | void>
+  listProjects: (req: Request, res: Response) => Promise<Response | void>
+  getProjectById: (req: Request, res: Response) => Promise<Response | void>
+  updateProjectById: (req: Request, res: Response) => Promise<Response | void>
+  applyToProject: (req: Request, res: Response) => Promise<Response | void>
+  getUserProjects: (req: Request, res: Response) => Promise<Response | void>
+  submitFeedback: (req: Request, res: Response) => Promise<Response | void>
+  getProjectFeedbacks: (req: Request, res: Response) => Promise<Response | void>
 }
 
 export function makeProjectController(
@@ -27,14 +27,14 @@ export function makeProjectController(
       const creator = await userService.getBySub(req.user.sub)
       if (!creator) throw new AppError('User not found', 404)
       const { success, error, data } = ProjectCreationSchema.safeParse(req.body)
-      if (!success) res.status(422).json({ errors: error.flatten() })
+      if (!success) return res.status(422).json({ errors: error.flatten() })
       const project = Project.fromObject({ ...data, creatorId: creator.id })
       await projectService.register(project)
       res.status(201).json(project.toObject())
     },
     async listProjects(req: Request, res: Response) {
       const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query)
-      if (!success) res.status(422).json({ errors: error.flatten() })
+      if (!success) return res.status(422).json({ errors: error.flatten() })
       const filters = { ...data }
 
       if (req.user.role === 'company') {
