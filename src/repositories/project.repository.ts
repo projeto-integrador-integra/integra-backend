@@ -304,6 +304,22 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .where(eq(projects.creatorId, user))
       .groupBy(projects.creatorId)
 
+    const resultAsDeveloper = await this.db
+      .select({
+        pending: count().as('pending'),
+        approved: count().as('approved'),
+        closed: count().as('closed'),
+      })
+      .from(projectParticipants)
+      .innerJoin(projects, eq(projectParticipants.projectId, projects.id))
+      .where(and(eq(projectParticipants.userId, user), ne(projects.creatorId, user)))
+      .groupBy(projectParticipants.userId)
+    if (resultAsDeveloper.length > 0) {
+      result[0].pending += resultAsDeveloper[0].pending
+      result[0].approved += resultAsDeveloper[0].approved
+      result[0].closed += resultAsDeveloper[0].closed
+    }
+
     if (result.length === 0) return { pending: 0, approved: 0, closed: 0 }
     return {
       pending: result[0].pending,

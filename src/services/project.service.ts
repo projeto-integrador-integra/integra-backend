@@ -206,9 +206,7 @@ export class ProjectService {
 
   async userSummary(user: User) {
     const projects = await this.projectRepository.userSummary(user.id)
-
-    if (['admin', 'company'].includes(user.role)) delete projects.pending
-
+    if (!['admin', 'company'].includes(user.role)) delete projects.pending
     return projects
   }
 }
