@@ -26,6 +26,7 @@ export function createProjectRoutes(
     controller.createProject
   )
   router.get('/', controller.listProjects)
+  router.get('/explore', controller.listExplorableProjects)
 
   router.get('/mine', controller.getUserProjects)
 

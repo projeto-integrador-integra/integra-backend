@@ -3,19 +3,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Project } from '@/models/domain/project'
 import { FakeProjectRepository } from '@/repositories/fake-project.repository'
-import { FakeUserRepository } from '@/repositories/fake-user.repository'
+import { FakeDatabase, FakeUserRepository } from '@/repositories/fake-user.repository'
 import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 import { createFakeProjectInfo, createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
 import { makeProjectController } from './project.controller'
-import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 
-const participantRepository = new FakeProjectParticipantRepository()
-const userRepository = new FakeUserRepository()
+const mockDB = new FakeDatabase()
+const userRepository = new FakeUserRepository(mockDB)
 const userService = new UserService(userRepository)
-const projectRepository = new FakeProjectRepository()
-const projectService = new ProjectService(projectRepository, participantRepository, userRepository)
+const projectRepository = new FakeProjectRepository(mockDB)
+const projectService = new ProjectService(projectRepository)
 const controller = makeProjectController(projectService, userService)
 
 const admin = createFakeUser('admin')

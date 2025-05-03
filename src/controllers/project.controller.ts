@@ -10,6 +10,7 @@ import { UserService } from '@/services/user.service'
 export interface ProjectController {
   createProject: (req: Request, res: Response) => Promise<void>
   listProjects: (req: Request, res: Response) => Promise<void>
+  listExplorableProjects: (req: Request, res: Response) => Promise<void>
   getProjectById: (req: Request, res: Response) => Promise<void>
   updateProjectById: (req: Request, res: Response) => Promise<void>
   applyToProject: (req: Request, res: Response) => Promise<void>
@@ -52,6 +53,28 @@ export function makeProjectController(
       }
 
       const projects = await projectService.list(filters)
+      res.status(200).json({
+        projects: projects.projects.map((project) => project.toObject()),
+        total: projects.total,
+        page: projects.page,
+        limit: projects.limit,
+      })
+    },
+
+    async listExplorableProjects(req: Request, res: Response) {
+      const userId = req.user.id
+      if (!userId) throw new AppError('User not found', 404)
+      const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query ?? {})
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
+
+      const projects = await projectService.listExplorable({
+        userId,
+        params: data,
+      })
+
       res.status(200).json({
         projects: projects.projects.map((project) => project.toObject()),
         total: projects.total,

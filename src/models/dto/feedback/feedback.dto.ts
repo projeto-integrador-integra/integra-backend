@@ -1,12 +1,14 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
 import { z } from 'zod'
 
+import { USER_ROLES } from '@/constants/user'
+
 extendZodWithOpenApi(z)
 
 export const FeedbackUserSchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  role: z.enum(['admin', 'mentor', 'dev', 'company']), // opcional se quiser mostrar
+  role: z.enum(USER_ROLES),
 })
 
 export const FeedbackSchema = z.object({

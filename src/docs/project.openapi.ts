@@ -213,6 +213,40 @@ export function registerProjectDocs() {
   })
 
   registry.registerPath({
+    method: 'get',
+    path: '/projects/explore',
+    tags: ['Project'],
+    description:
+      'Lista dos projetos em que o usuário autenticado (dev ou mentor) não está participando, mas consegue se candidatar.',
+    request: {
+      query: ProjectsListOwnQuerySchema,
+    },
+    responses: {
+      200: {
+        description: 'Projetos da empresa',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                projects: {
+                  type: 'array',
+                  items: { $ref: '#/components/schemas/Project' },
+                },
+                total: { type: 'number' },
+                page: { type: 'number' },
+                limit: { type: 'number' },
+              },
+            },
+          },
+        },
+      },
+      401: { description: 'Usuário não autenticado' },
+      403: { description: 'Acesso permitido apenas para empresas' },
+    },
+  })
+
+  registry.registerPath({
     method: 'post',
     path: '/projects/{id}/feedback',
     tags: ['Project'],
