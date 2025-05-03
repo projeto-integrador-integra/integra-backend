@@ -293,38 +293,38 @@ export class DrizzleProjectRepository implements ProjectRepository {
     return { feedbacks: feedbacksList }
   }
 
-  async userSummary(user: string) {
-    const result = await this.db
-      .select({
-        pending: count().as('pending'),
-        approved: count().as('approved'),
-        closed: count().as('closed'),
-      })
-      .from(projects)
-      .where(eq(projects.creatorId, user))
-      .groupBy(projects.creatorId)
+  async userSummary(userId: string) {
+    const baseWhere = or(eq(projects.creatorId, userId), eq(projectParticipants.userId, userId))
 
-    const resultAsDeveloper = await this.db
-      .select({
-        pending: count().as('pending'),
-        approved: count().as('approved'),
-        closed: count().as('closed'),
-      })
-      .from(projectParticipants)
-      .innerJoin(projects, eq(projectParticipants.projectId, projects.id))
-      .where(and(eq(projectParticipants.userId, user), ne(projects.creatorId, user)))
-      .groupBy(projectParticipants.userId)
-    if (resultAsDeveloper.length > 0) {
-      result[0].pending += resultAsDeveloper[0].pending
-      result[0].approved += resultAsDeveloper[0].approved
-      result[0].closed += resultAsDeveloper[0].closed
-    }
+    const [pendingCount, approvedCount, closedCount] = await Promise.all([
+      this.db
+        .select({ count: count() })
+        .from(projects)
+        .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+        .where(and(baseWhere, eq(projects.approvalStatus, 'pending')))
+        .then(([res]) => res?.count ?? 0),
 
-    if (result.length === 0) return { pending: 0, approved: 0, closed: 0 }
+      this.db
+        .select({ count: count() })
+        .from(projects)
+        .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+        .where(
+          and(baseWhere, eq(projects.status, 'active'), eq(projects.approvalStatus, 'approved'))
+        )
+        .then(([res]) => res?.count ?? 0),
+
+      this.db
+        .select({ count: count() })
+        .from(projects)
+        .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+        .where(and(baseWhere, eq(projects.status, 'closed')))
+        .then(([res]) => res?.count ?? 0),
+    ])
+
     return {
-      pending: result[0].pending,
-      approved: result[0].approved,
-      closed: result[0].closed,
+      pending: pendingCount,
+      approved: approvedCount,
+      closed: closedCount,
     }
   }
 }
