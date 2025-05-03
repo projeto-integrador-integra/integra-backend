@@ -104,35 +104,31 @@ export class DrizzleProjectRepository implements ProjectRepository {
     page = 1,
     limit = 10,
     userId,
-  }: {
-    page?: number
-    limit?: number
-    userId: string
-  }) {
+    title,
+    createdBy,
+    approvalStatus,
+  }: ProjectsListQueryType & { userId: string }) {
     const offset = (page - 1) * limit
+    const query = [
+      or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
+      eq(projects.status, 'active'),
+    ]
+    if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
+    if (createdBy) query.push(eq(projects.creatorId, createdBy))
+    if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
 
     const [total] = await this.db
       .select({ count: count() })
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
-      .where(
-        and(
-          or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
-          eq(projects.status, 'active')
-        )
-      )
+      .where(and(...query))
 
     const listAll = await this.db
       .select()
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
       .innerJoin(users, eq(projectParticipants.userId, users.id))
-      .where(
-        and(
-          or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
-          eq(projects.status, 'active')
-        )
-      )
+      .where(and(...query))
       .limit(limit)
       .offset(offset)
 
@@ -144,26 +140,31 @@ export class DrizzleProjectRepository implements ProjectRepository {
   async listMyProjects({
     page = 1,
     limit = 10,
+    approvalStatus,
+    createdBy,
+    status,
+    title,
     userId,
-  }: {
-    page?: number
-    limit?: number
-    userId: string
-  }) {
+  }: ProjectsListQueryType & { userId: string }) {
     const offset = (page - 1) * limit
+    const query = [isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)]
+    if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
+    if (createdBy) query.push(eq(projects.creatorId, createdBy))
+    if (status) query.push(eq(projects.status, status))
+    if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
 
     const [total] = await this.db
       .select({ count: count() })
       .from(projects)
       .innerJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
-      .where(and(isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)))
+      .where(and(...query))
 
     const listAll = await this.db
       .select()
       .from(projects)
       .innerJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
       .innerJoin(users, eq(projectParticipants.userId, users.id))
-      .where(and(isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)))
+      .where(and(...query))
       .limit(limit)
       .offset(offset)
 
