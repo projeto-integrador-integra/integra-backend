@@ -79,6 +79,36 @@ export class FakeProjectRepository implements ProjectRepository {
     }
   }
 
+  async listMyProjects({
+    userId,
+    params,
+  }: {
+    userId: string
+    params: ProjectsListQueryType
+  }): Promise<{ projects: Project[]; total: number; page: number; limit: number }> {
+    const { page = 1, limit = 10, status, title } = params
+    const offset = (page - 1) * limit
+
+    console.log('userId', userId)
+
+    const myProject = this.db.participants.find((p) => p.userId === userId)
+    if (!myProject) return { projects: [], total: 0, page, limit }
+
+    const filtered = this.db.projects.filter((project) => {
+      if (status && project.status !== status) return false
+      if (title && !project.name.toLowerCase().includes(title.toLowerCase())) return false
+      if (project.id === myProject?.id) return false
+      return true
+    })
+
+    return {
+      projects: filtered.slice(offset, offset + limit).map((p) => new Project(p)),
+      total: filtered.length,
+      page,
+      limit,
+    }
+  }
+
   async findSimilarProject({
     userId,
     title,

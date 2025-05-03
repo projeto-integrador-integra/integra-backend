@@ -82,6 +82,7 @@ export function makeProjectController(
         limit: projects.limit,
       })
     },
+
     async getProjectById(req: Request, res: Response) {
       const id = req.params?.id
 
@@ -167,41 +168,20 @@ export function makeProjectController(
       })
     },
     async getUserProjects(req: Request, res: Response) {
-      // TODO buscar projetos do usuário
+      const userId = req.user.id
+      if (!userId) throw new AppError('User not found', 404)
+      const { success, error, data } = ProjectsListQuerySchema.safeParse(req.query ?? {})
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
 
+      const projects = await projectService.listMyProjects({ userId, params: data })
       res.status(200).json({
-        projects: [
-          {
-            id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            name: 'depereo eum ab',
-            description: 'Aegrus aliqua textor vetus attero nihil.',
-            creatorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            tags: ['tags'],
-            needsMentors: true,
-            needsDevs: true,
-            maxParticipants: 3,
-            status: 'active',
-            approvalStatus: 'approved',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            members: [
-              {
-                id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                sub: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                role: 'admin',
-                name: 'Eum ab',
-                description: 'Aliqua textor vetus attero nihil.',
-                email: 'user@example.com',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                approvalStatus: 'approved',
-              },
-            ],
-          },
-        ],
-        total: 1,
-        page: 1,
-        limit: 1,
+        projects: projects.projects.map((project) => project.toObject()),
+        total: projects.total,
+        page: projects.page,
+        limit: projects.limit,
       })
     },
     async submitFeedback(req: Request, res: Response) {

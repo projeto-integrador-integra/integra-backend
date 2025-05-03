@@ -2,12 +2,14 @@ import { Request } from 'express'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Project } from '@/models/domain/project'
+import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 import { FakeProjectRepository } from '@/repositories/fake-project.repository'
 import { FakeDatabase, FakeUserRepository } from '@/repositories/fake-user.repository'
 import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 import { createFakeProjectInfo, createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
+import { randomUUID } from 'node:crypto'
 import { makeProjectController } from './project.controller'
 
 const mockDB = new FakeDatabase()
@@ -15,6 +17,7 @@ const userRepository = new FakeUserRepository(mockDB)
 const userService = new UserService(userRepository)
 const projectRepository = new FakeProjectRepository(mockDB)
 const projectService = new ProjectService(projectRepository)
+const projectParticipantsRepository = new FakeProjectParticipantRepository(mockDB)
 const controller = makeProjectController(projectService, userService)
 
 const admin = createFakeUser('admin')
@@ -148,10 +151,16 @@ describe('ProjectController', () => {
     )
   })
 
-  it('should return projects of the logged user', async () => {
+  it.only('should return projects of the logged user', async () => {
     const res = createMockResponse()
     const project = Project.fromObject(createFakeProjectInfo(), [dev])
     await projectRepository.create(project)
+    await projectParticipantsRepository.create({
+      id: randomUUID(),
+      projectId: project.id,
+      userId: dev.id,
+      joinedAt: new Date(),
+    })
 
     const req = { user: dev } as unknown as Request
 

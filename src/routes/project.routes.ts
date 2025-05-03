@@ -28,7 +28,7 @@ export function createProjectRoutes(
   router.get('/', controller.listProjects)
   router.get('/explore', controller.listExplorableProjects)
 
-  router.get('/mine', controller.getUserProjects)
+  router.get('/mine', requireAccess(userService, ['dev', 'mentor']), controller.getUserProjects)
 
   router.get('/:id', controller.getProjectById)
   router.patch(

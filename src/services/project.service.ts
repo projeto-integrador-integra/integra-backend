@@ -45,4 +45,13 @@ export class ProjectService {
 
     return result
   }
+
+  async listMyProjects({ userId, params }: { userId: string; params: ProjectsListQueryType }) {
+    const result = await this.projectRepository.listMyProjects({
+      userId,
+      params,
+    })
+
+    return result
+  }
 }
