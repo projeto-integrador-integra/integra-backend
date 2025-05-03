@@ -2,6 +2,7 @@ import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
 import { User } from '@/models/domain/user'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
+import { Feedback, feedbacks } from '@/models/schema/feedbacks'
 import { projectParticipants } from '@/models/schema/project-participants'
 import { projects } from '@/models/schema/projects'
 import { users } from '@/models/schema/user'
@@ -35,6 +36,14 @@ export interface ProjectRepository {
     projectId: string
     message: string
   }): Promise<{ success: boolean; message: string }>
+  submitFeedback(params: {
+    userId: string
+    projectId: string
+    comment: string
+    link: string
+    rating: number
+  }): Promise<{ result: Feedback }>
+  getProjectFeedbacks(params: { projectId: string }): Promise<{ feedbacks: Feedback[] }>
 }
 
 export class DrizzleProjectRepository implements ProjectRepository {
@@ -222,5 +231,54 @@ export class DrizzleProjectRepository implements ProjectRepository {
     if (applications.rowCount === 0)
       throw new AppError('Failed to apply', 500, 'APPLICATION_FAILED')
     return { success: true, message: 'Applied successfully' }
+  }
+
+  async submitFeedback({
+    userId,
+    projectId,
+    comment,
+    link,
+    rating,
+  }: {
+    userId: string
+    projectId: string
+    comment: string
+    link: string
+    rating: number
+  }) {
+    try {
+      const [result] = await this.db
+        .insert(feedbacks)
+        .values({
+          userId,
+          projectId,
+          comment,
+          link,
+          rating,
+        })
+        .returning()
+
+      return { result }
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('duplicate key')) {
+        throw new AppError(
+          'Você já enviou feedback para esse projeto',
+          409,
+          'FEEDBACK_ALREADY_SUBMITTED'
+        )
+      }
+      throw new AppError('Erro ao salvar feedback', 500, 'FEEDBACK_SUBMISSION_FAILED')
+    }
+  }
+
+  async getProjectFeedbacks({ projectId }: { projectId: string }) {
+    const result = await this.db
+      .select()
+      .from(projects)
+      .innerJoin(feedbacks, eq(projects.id, feedbacks.projectId))
+      .where(eq(projects.id, projectId))
+      .then((rows) => rows.map((row) => row.feedbacks))
+
+    return { feedbacks: result }
   }
 }

@@ -3,6 +3,7 @@ import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
 import { randomUUID } from 'node:crypto'
 import { FakeDatabase } from './fake-user.repository'
 import { ProjectRepository } from './project.repository'
+import { Feedback } from '@/models/schema/feedbacks'
 
 export class FakeProjectRepository implements ProjectRepository {
   constructor(private readonly db: FakeDatabase) {}
@@ -154,6 +155,42 @@ export class FakeProjectRepository implements ProjectRepository {
       joinedAt: new Date(),
     })
     return { success: true, message: 'Applied successfully' }
+  }
+
+  async submitFeedback({
+    projectId,
+    userId,
+    comment,
+    link = '',
+    rating,
+  }: {
+    projectId: string
+    userId: string
+    comment: string
+    link?: string
+    rating: number
+  }) {
+    const feedback = {
+      id: randomUUID(),
+      projectId,
+      userId,
+      comment,
+      link,
+      rating,
+      createdAt: new Date(),
+    }
+    this.db.feedbacks.push(feedback)
+    return { result: feedback }
+  }
+
+  async getProjectFeedbacks({
+    projectId,
+  }: {
+    projectId: string
+  }): Promise<{ feedbacks: Feedback[] }> {
+    const feedbacks = this.db.feedbacks.filter((feedback) => feedback.projectId === projectId)
+
+    return { feedbacks }
   }
 
   clear(): void {

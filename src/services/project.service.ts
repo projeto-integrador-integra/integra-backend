@@ -1,10 +1,10 @@
 import { MAX_PROJECTS_PER_USER } from '@/constants/user'
 import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
+import { User } from '@/models/domain/user'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
 import { ProjectRepository } from '@/repositories/project.repository'
 import { EmailService } from './email/email.service'
-import { User } from '@/models/domain/user'
 
 export class ProjectService {
   constructor(
@@ -135,5 +135,37 @@ export class ProjectService {
       )
 
     return project
+  }
+
+  async submitFeedback({
+    projectId,
+    userId,
+    comment,
+    link = '',
+    rating,
+  }: {
+    projectId: string
+    userId: string
+    comment: string
+    link?: string
+    rating: number
+  }) {
+    const project = await this.projectRepository.getById(projectId)
+    if (!project) throw new AppError('Projeto não encontrado', 404, 'PROJECT_NOT_FOUND')
+
+    if (!project.members.some((participant) => participant.id === userId))
+      throw new AppError('Você não está participando deste projeto', 409, 'NOT_PARTICIPATING')
+
+    const { result } = await this.projectRepository.submitFeedback({
+      projectId,
+      userId,
+      comment,
+      link,
+      rating,
+    })
+
+    if (!result) throw new AppError('Erro ao enviar feedback', 500, 'FEEDBACK_SUBMIT_ERROR')
+
+    return result
   }
 }
