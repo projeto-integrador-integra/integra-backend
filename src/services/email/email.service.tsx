@@ -13,6 +13,11 @@ interface SendEmailInput {
 export interface EmailService {
   sendEmail: (input: SendEmailInput) => Promise<void>
   sendWelcomeEmail: (input: { to: string; name: string }) => Promise<void>
+  sendCompletedGroupEmail: (input: {
+    to: string
+    name: string
+    projectName: string
+  }) => Promise<void>
 }
 
 export class ResendEmailService implements EmailService {
@@ -64,6 +69,33 @@ export class ResendEmailService implements EmailService {
     } catch (error) {
       console.error('Erro ao enviar email de boas-vindas:', error)
       throw new Error('Erro interno ao enviar email de boas-vindas.')
+    }
+  }
+
+  async sendCompletedGroupEmail({
+    to,
+    name,
+    projectName,
+  }: {
+    to: string
+    name: string
+    projectName: string
+  }) {
+    const firstName = name.trim().split(' ')[0] || 'Usuário'
+    const formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()
+
+    const personalizedHtml = this.templates.welcome.replace('{{name}}', formattedName)
+
+    try {
+      await this.sendEmail({
+        to,
+        subject: `Grupo ${projectName} concluído!`,
+        html: personalizedHtml,
+        text: `Olá ${formattedName}, o grupo ${projectName} foi concluído! Acesse: https://integra.charmbyte.dev/login`,
+      })
+    } catch (error) {
+      console.error('Erro ao enviar email de conclusão de grupo:', error)
+      throw new Error('Erro interno ao enviar email de conclusão de grupo.')
     }
   }
 }

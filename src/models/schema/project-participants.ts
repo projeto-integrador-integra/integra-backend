@@ -1,6 +1,6 @@
-import { pgTable, uuid, timestamp } from 'drizzle-orm/pg-core'
-import { users } from './user'
+import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { projects } from './projects'
+import { users } from './user'
 
 export const projectParticipants = pgTable('project_participants', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -10,6 +10,7 @@ export const projectParticipants = pgTable('project_participants', {
   projectId: uuid('project_id')
     .notNull()
     .references(() => projects.id),
+  message: text('message').default(''),
   joinedAt: timestamp('joined_at').defaultNow(),
 })
 
@@ -17,5 +18,6 @@ export interface ProjectParticipant {
   id: string
   userId: string
   projectId: string
+  message: string | null
   joinedAt: Date | null
 }

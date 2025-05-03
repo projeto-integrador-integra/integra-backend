@@ -1,3 +1,4 @@
+import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
 import { User } from '@/models/domain/user'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
@@ -15,6 +16,7 @@ interface RowType {
 
 export interface ProjectRepository {
   create(project: Project): Promise<Project>
+  update(project: Project): Promise<Project>
   getById(id: string): Promise<Project | null>
   listProjects(
     params?: ProjectsListQueryType
@@ -28,6 +30,11 @@ export interface ProjectRepository {
     params?: ProjectsListQueryType
   }): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   findSimilarProject(params: { userId: string; title: string }): Promise<Project[]>
+  applyToProject(params: {
+    userId: string
+    projectId: string
+    message: string
+  }): Promise<{ success: boolean; message: string }>
 }
 
 export class DrizzleProjectRepository implements ProjectRepository {
@@ -38,10 +45,28 @@ export class DrizzleProjectRepository implements ProjectRepository {
     return project
   }
 
+  async update(project: Project): Promise<Project> {
+    await this.db.update(projects).set(project.toObject()).where(eq(projects.id, project.id))
+    return project
+  }
+
   async getById(id: string): Promise<Project | null> {
-    const [project] = await this.db.select().from(projects).where(eq(projects.id, id))
-    if (!project) return null
-    return Project.fromObject(project)
+    const result = await this.db
+      .select()
+      .from(projects)
+      .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .leftJoin(users, eq(projectParticipants.userId, users.id))
+      .where(eq(projects.id, id))
+    if (!result) return null
+    const project = Project.fromObject(result[0].projects)
+
+    result.forEach((row) => {
+      if (row.users) {
+        const user = User.fromObject(row.users)
+        project.addMember(user)
+      }
+    })
+    return project
   }
 
   async listProjects({
@@ -126,7 +151,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .select()
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
-      .innerJoin(users, eq(projectParticipants.userId, users.id))
+      .leftJoin(users, eq(projectParticipants.userId, users.id))
       .where(and(...query))
       .limit(limit)
       .offset(offset)
@@ -177,5 +202,25 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .where(and(eq(projects.creatorId, userId), ilike(projects.name, `%${title.trim()}%`)))
 
     return projectList.map((project) => Project.fromObject(project))
+  }
+
+  async applyToProject({
+    userId,
+    projectId,
+    message,
+  }: {
+    userId: string
+    projectId: string
+    message: string
+  }): Promise<{ success: boolean; message: string }> {
+    const applications = await this.db.insert(projectParticipants).values({
+      userId,
+      projectId,
+      message,
+    })
+
+    if (applications.rowCount === 0)
+      throw new AppError('Failed to apply', 500, 'APPLICATION_FAILED')
+    return { success: true, message: 'Applied successfully' }
   }
 }
