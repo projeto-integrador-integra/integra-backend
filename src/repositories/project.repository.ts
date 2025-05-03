@@ -4,7 +4,7 @@ import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
 import { projectParticipants } from '@/models/schema/project-participants'
 import { projects } from '@/models/schema/projects'
 import { users } from '@/models/schema/user'
-import { and, count, eq, ilike, isNull, ne, or } from 'drizzle-orm'
+import { and, count, eq, ilike, isNotNull, isNull, ne, or } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 
 interface RowType {
@@ -20,6 +20,10 @@ export interface ProjectRepository {
     params?: ProjectsListQueryType
   ): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   listExplorable(params: {
+    userId: string
+    params?: ProjectsListQueryType
+  }): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
+  listMyProjects(params: {
     userId: string
     params?: ProjectsListQueryType
   }): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
@@ -122,13 +126,44 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .select()
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
-      .leftJoin(users, eq(projectParticipants.userId, users.id))
+      .innerJoin(users, eq(projectParticipants.userId, users.id))
       .where(
         and(
           or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
           eq(projects.status, 'active')
         )
       )
+      .limit(limit)
+      .offset(offset)
+
+    const projectList = this.groupProjectsWithEntities(listAll)
+
+    return { projects: projectList, page, limit, total: total.count }
+  }
+
+  async listMyProjects({
+    page = 1,
+    limit = 10,
+    userId,
+  }: {
+    page?: number
+    limit?: number
+    userId: string
+  }) {
+    const offset = (page - 1) * limit
+
+    const [total] = await this.db
+      .select({ count: count() })
+      .from(projects)
+      .innerJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .where(and(isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)))
+
+    const listAll = await this.db
+      .select()
+      .from(projects)
+      .innerJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .innerJoin(users, eq(projectParticipants.userId, users.id))
+      .where(and(isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)))
       .limit(limit)
       .offset(offset)
 
