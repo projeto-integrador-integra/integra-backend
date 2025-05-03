@@ -11,6 +11,6 @@ export const feedbacks = pgTable('feedbacks', {
     .notNull()
     .references(() => users.id),
   comment: text('comment').notNull(),
-  link: text('link'),
+  link: text('link').default(''),
   createdAt: timestamp('created_at').defaultNow(),
 })

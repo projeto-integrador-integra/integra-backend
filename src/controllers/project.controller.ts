@@ -6,6 +6,8 @@ import { ProjectCreationSchema } from '@/models/dto/project/create.dto'
 import { ProjectsListQuerySchema } from '@/models/dto/project/list.dto'
 import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
+import { ProjectApplySchema } from '@/models/dto/project/apply.dto'
+import { User } from '@/models/domain/user'
 
 export interface ProjectController {
   createProject: (req: Request, res: Response) => Promise<void>
@@ -129,43 +131,24 @@ export function makeProjectController(
       })
     },
     async applyToProject(req: Request, res: Response) {
-      // TODO verificar se o projeto existe
-      // TODO verificar se o projeto está aprovado pelos admins
-      // TODO verificar se o usuário já aplicou para outro projeto e está em andamento/análise
-      // TODO verificar se o usuário já está no projeto
-      // TODO se for mentor verificar se já existe um mentor no projeto
-      // TODO se for dev, verificar se já atingiu o número máximo de devs
-      // TODO se for o ultimo dev, enviar email para todos os devs/mentores do projeto
-
       const id = req.params?.id
+      const userId = req.user.id
+      const role = req.user.role
+      if (!userId || !role) throw new AppError('User not found', 404)
 
-      res.status(201).json({
-        id,
-        name: 'depereo eum ab',
-        description: 'Aegrus aliqua textor vetus attero nihil.',
-        creatorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        tags: ['tags'],
-        needsMentors: true,
-        needsDevs: true,
-        maxParticipants: 3,
-        status: 'active',
-        approvalStatus: 'approved',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        members: [
-          {
-            id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            sub: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            role: 'admin',
-            name: 'Eum ab',
-            description: 'Aliqua textor vetus attero nihil.',
-            email: 'user@example.com',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            approvalStatus: 'approved',
-          },
-        ],
+      const { success, data, error } = ProjectApplySchema.safeParse(req.body)
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
+
+      const applyToProject = await projectService.applyToProject({
+        projectId: id,
+        message: data.message ?? '',
+        user: User.fromObject(req.user),
       })
+
+      res.status(201).json(applyToProject.toObject())
     },
     async getUserProjects(req: Request, res: Response) {
       const userId = req.user.id

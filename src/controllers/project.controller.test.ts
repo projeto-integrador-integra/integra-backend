@@ -5,6 +5,7 @@ import { Project } from '@/models/domain/project'
 import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 import { FakeProjectRepository } from '@/repositories/fake-project.repository'
 import { FakeDatabase, FakeUserRepository } from '@/repositories/fake-user.repository'
+import { FakeEmailService } from '@/services/email/fake-email.service'
 import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 import { createFakeProjectInfo, createFakeUser, expectUuid } from '@/testes/helper'
@@ -16,7 +17,8 @@ const mockDB = new FakeDatabase()
 const userRepository = new FakeUserRepository(mockDB)
 const userService = new UserService(userRepository)
 const projectRepository = new FakeProjectRepository(mockDB)
-const projectService = new ProjectService(projectRepository)
+const fakeServiceEmail = new FakeEmailService()
+const projectService = new ProjectService(projectRepository, fakeServiceEmail)
 const projectParticipantsRepository = new FakeProjectParticipantRepository(mockDB)
 const controller = makeProjectController(projectService, userService)
 
@@ -160,6 +162,7 @@ describe('ProjectController', () => {
       projectId: project.id,
       userId: dev.id,
       joinedAt: new Date(),
+      message: 'I want to join this project',
     })
 
     const req = { user: dev } as unknown as Request

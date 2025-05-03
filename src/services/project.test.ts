@@ -7,10 +7,12 @@ import { ProjectService } from '@/services/project.service'
 import { faker } from '@faker-js/faker'
 import { randomUUID } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { FakeEmailService } from './email/fake-email.service'
 
+const emailService = new FakeEmailService()
 const mockDB = new FakeDatabase()
 const projectRespository = new FakeProjectRepository(mockDB)
-const service = new ProjectService(projectRespository)
+const service = new ProjectService(projectRespository, emailService)
 
 const data = {
   name: 'Projeto Teste',

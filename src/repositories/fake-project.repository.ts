@@ -1,5 +1,6 @@
 import { Project } from '@/models/domain/project'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
+import { randomUUID } from 'node:crypto'
 import { FakeDatabase } from './fake-user.repository'
 import { ProjectRepository } from './project.repository'
 
@@ -121,6 +122,38 @@ export class FakeProjectRepository implements ProjectRepository {
         project.creatorId === userId && project.name.toLowerCase().includes(title.toLowerCase())
     )
     return projectList.map((project) => new Project(project))
+  }
+
+  async update(project: Project): Promise<Project> {
+    const index = this.db.projects.findIndex((p) => p.id === project.id)
+    if (index === -1) throw new Error('Project not found')
+
+    this.db.projects[index] = project
+    return project
+  }
+
+  async applyToProject(params: {
+    userId: string
+    projectId: string
+    message: string
+  }): Promise<{ success: boolean; message: string }> {
+    const { userId, projectId, message } = params
+    const project = this.db.projects.find((p) => p.id === projectId)
+    if (!project) return { success: false, message: 'Project not found' }
+
+    const participant = this.db.participants.find(
+      (p) => p.userId === userId && p.projectId === projectId
+    )
+    if (participant) return { success: false, message: 'Already applied to this project' }
+
+    this.db.participants.push({
+      id: randomUUID(),
+      userId,
+      projectId,
+      message,
+      joinedAt: new Date(),
+    })
+    return { success: true, message: 'Applied successfully' }
   }
 
   clear(): void {

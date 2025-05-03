@@ -17,7 +17,7 @@ export async function initDependencies() {
   const userService = new UserService(userRepository)
   const userController = makeUserController(userService, emailService)
   const projectRepository = new DrizzleProjectRepository(db)
-  const projectService = new ProjectService(projectRepository)
+  const projectService = new ProjectService(projectRepository, emailService)
   const projectController = makeProjectController(projectService, userService)
   const authService = await makeAuthService()
   const authController = makeAuthController(authService)

@@ -22,4 +22,21 @@ export class FakeEmailService implements EmailService {
 
     console.log(`🧪 [FAKE EMAIL] Bem-vindo(a) ${formattedName} (${to})!`)
   }
+
+  async sendCompletedGroupEmail({
+    to,
+    name,
+    projectName,
+  }: {
+    to: string
+    name: string
+    projectName: string
+  }) {
+    const firstName = name.trim().split(' ')[0] || 'Usuário'
+    const formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()
+
+    console.log(
+      `🧪 [FAKE EMAIL] Parabéns ${formattedName} (${to})! Você completou o projeto ${projectName}!`
+    )
+  }
 }
