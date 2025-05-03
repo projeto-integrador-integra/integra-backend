@@ -109,11 +109,6 @@ export function makeProjectController(
       })
     },
     async updateProjectById(req: Request, res: Response) {
-      // TODO: Validar o body
-      // TODO: Verificar se o projeto existe
-      // TODO: Se for company verificar se o usuário é o dono do projeto
-      // TODO Update o projeto no banco de dados
-
       const id = req.params?.id
       const user = User.fromObject(req.user)
       const { success, error, data } = ProjectUpdateSchema.safeParse(req.body)
