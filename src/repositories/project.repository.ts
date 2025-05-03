@@ -1,8 +1,17 @@
 import { Project } from '@/models/domain/project'
+import { User } from '@/models/domain/user'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
+import { projectParticipants } from '@/models/schema/project-participants'
 import { projects } from '@/models/schema/projects'
-import { and, count, eq, ilike } from 'drizzle-orm'
+import { users } from '@/models/schema/user'
+import { and, count, eq, ilike, isNull, ne, or } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
+
+interface RowType {
+  projects: typeof projects.$inferSelect
+  project_participants: typeof projectParticipants.$inferSelect | null
+  users: typeof users.$inferSelect | null
+}
 
 export interface ProjectRepository {
   create(project: Project): Promise<Project>
@@ -10,6 +19,10 @@ export interface ProjectRepository {
   listProjects(
     params?: ProjectsListQueryType
   ): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
+  listExplorable(params: {
+    userId: string
+    params?: ProjectsListQueryType
+  }): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   findSimilarProject(params: { userId: string; title: string }): Promise<Project[]>
 }
 
@@ -43,9 +56,11 @@ export class DrizzleProjectRepository implements ProjectRepository {
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
     if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
 
-    const list = await this.db
+    const listAll = await this.db
       .select()
       .from(projects)
+      .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .leftJoin(users, eq(projectParticipants.userId, users.id))
       .where(and(...query))
       .limit(limit)
       .offset(offset)
@@ -55,12 +70,71 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .from(projects)
       .where(and(...query))
 
+    const projectList = this.groupProjectsWithEntities(listAll)
+
     return {
-      projects: list.map((project) => Project.fromObject(project)),
+      projects: projectList,
       total: total.count,
       page,
       limit,
     }
+  }
+
+  private groupProjectsWithEntities(rows: RowType[]): Project[] {
+    const map = new Map<string, Project>()
+
+    for (const row of rows) {
+      const id = row.projects.id
+      if (!map.has(id)) {
+        map.set(id, Project.fromObject(row.projects))
+      }
+      if (row.users) {
+        const user = User.fromObject(row.users)
+        map.get(id)!.addMember(user)
+      }
+    }
+    return Array.from(map.values())
+  }
+
+  async listExplorable({
+    page = 1,
+    limit = 10,
+    userId,
+  }: {
+    page?: number
+    limit?: number
+    userId: string
+  }) {
+    const offset = (page - 1) * limit
+
+    const [total] = await this.db
+      .select({ count: count() })
+      .from(projects)
+      .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .where(
+        and(
+          or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
+          eq(projects.status, 'active')
+        )
+      )
+
+    const listAll = await this.db
+      .select()
+      .from(projects)
+      .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
+      .leftJoin(users, eq(projectParticipants.userId, users.id))
+      .where(
+        and(
+          or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
+          eq(projects.status, 'active')
+        )
+      )
+      .limit(limit)
+      .offset(offset)
+
+    const projectList = this.groupProjectsWithEntities(listAll)
+
+    return { projects: projectList, page, limit, total: total.count }
   }
 
   async findSimilarProject({ userId, title }: { userId: string; title: string }) {

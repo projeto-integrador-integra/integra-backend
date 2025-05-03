@@ -1,18 +1,16 @@
 import { MAX_PROJECTS_PER_USER } from '@/constants/user'
 import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
-import { FakeProjectParticipantRepository } from '@/repositories/fake-project-participant.repository'
 import { FakeProjectRepository } from '@/repositories/fake-project.repository'
-import { FakeUserRepository } from '@/repositories/fake-user.repository'
+import { FakeDatabase } from '@/repositories/fake-user.repository'
 import { ProjectService } from '@/services/project.service'
 import { faker } from '@faker-js/faker'
 import { randomUUID } from 'node:crypto'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const userRepository = new FakeUserRepository()
-const participantRepository = new FakeProjectParticipantRepository()
-const projectRespository = new FakeProjectRepository()
-const service = new ProjectService(projectRespository, participantRepository, userRepository)
+const mockDB = new FakeDatabase()
+const projectRespository = new FakeProjectRepository(mockDB)
+const service = new ProjectService(projectRespository)
 
 const data = {
   name: 'Projeto Teste',
