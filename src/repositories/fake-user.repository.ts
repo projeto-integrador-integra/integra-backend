@@ -1,6 +1,7 @@
 import { Project } from '@/models/domain/project'
 import { User } from '@/models/domain/user'
 import { ListUsersQueryType } from '@/models/dto/user/list.dto'
+import { Feedback } from '@/models/schema/feedbacks'
 import { ProjectParticipant } from '@/models/schema/project-participants'
 import { UserRepository } from './user.repository'
 
@@ -8,11 +9,13 @@ export class FakeDatabase {
   users: User[] = []
   projects: Project[] = []
   participants: ProjectParticipant[] = []
+  feedbacks: Feedback[] = []
 
   clear() {
     this.users = []
     this.projects = []
     this.participants = []
+    this.feedbacks = []
   }
 }
 

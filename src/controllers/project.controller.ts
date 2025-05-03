@@ -8,6 +8,7 @@ import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 import { ProjectApplySchema } from '@/models/dto/project/apply.dto'
 import { User } from '@/models/domain/user'
+import { FeedbackCreateSchema } from '@/models/dto/feedback/create.dto'
 
 export interface ProjectController {
   createProject: (req: Request, res: Response) => Promise<void>
@@ -168,25 +169,29 @@ export function makeProjectController(
       })
     },
     async submitFeedback(req: Request, res: Response) {
-      // TODO validar o body
-      // TODO verificar se o projeto existe
-      // TODO verificar se o usuário já está no projeto
-      // TODO verificar se o usuário já enviou feedback para o projeto
+      const { success, data, error } = FeedbackCreateSchema.safeParse(req.body)
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
+      const userId = req.user.id
+      const role = req.user.role
+      if (!userId || !role) throw new AppError('User not found', 404)
 
-      const id = req.params?.id
+      const result = await projectService.submitFeedback({
+        projectId: req.params.id,
+        userId,
+        comment: data.comment ?? '',
+        link: data.link,
+        rating: data.rating ?? 0,
+      })
 
       res.status(201).json({
-        id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        projectId: id,
-        comment: 'stringstri',
-        link: 'string',
-        rating: 5,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        ...result,
         user: {
-          id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          name: 'string',
-          role: 'admin',
+          id: req.user.id,
+          name: req.user.name,
+          role: req.user.role,
         },
       })
     },
