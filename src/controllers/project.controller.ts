@@ -196,25 +196,14 @@ export function makeProjectController(
       })
     },
     async getProjectFeedbacks(req: Request, res: Response) {
-      // TODO buscar no banco de dados os feedbacks do projeto
+      const id = req.params?.id
+      if (!id) throw new AppError('Project not found', 404)
 
-      res.status(200).json({
-        feedbacks: [
-          {
-            id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            comment: 'stringstri',
-            link: 'string',
-            rating: 5,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            user: {
-              id: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-              name: 'string',
-              role: 'admin',
-            },
-          },
-        ],
+      const feedbacks = await projectService.getProjectFeedbacks({
+        projectId: id,
       })
+
+      res.status(200).json(feedbacks)
     },
   }
 }

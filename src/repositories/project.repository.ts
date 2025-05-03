@@ -276,9 +276,19 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .select()
       .from(projects)
       .innerJoin(feedbacks, eq(projects.id, feedbacks.projectId))
+      .innerJoin(users, eq(feedbacks.userId, users.id))
       .where(eq(projects.id, projectId))
-      .then((rows) => rows.map((row) => row.feedbacks))
 
-    return { feedbacks: result }
+    const feedbacksList = result.map((row) => ({
+      ...row.feedbacks,
+      user: {
+        id: row.users.id,
+        name: row.users.name,
+        email: row.users.email,
+        role: row.users.role,
+      },
+    }))
+
+    return { feedbacks: feedbacksList }
   }
 }
