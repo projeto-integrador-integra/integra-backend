@@ -274,10 +274,9 @@ export class DrizzleProjectRepository implements ProjectRepository {
   async getProjectFeedbacks({ projectId }: { projectId: string }) {
     const result = await this.db
       .select()
-      .from(projects)
-      .innerJoin(feedbacks, eq(projects.id, feedbacks.projectId))
+      .from(feedbacks)
       .innerJoin(users, eq(feedbacks.userId, users.id))
-      .where(eq(projects.id, projectId))
+      .where(eq(feedbacks.projectId, projectId))
 
     const feedbacksList = result.map((row) => ({
       ...row.feedbacks,
