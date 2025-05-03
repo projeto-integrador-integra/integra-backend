@@ -3,6 +3,7 @@ import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
 import { User } from '@/models/domain/user'
 import { ProjectsListQueryType } from '@/models/dto/project/list.dto'
+import { ProjectUpdateType } from '@/models/dto/project/update.dto'
 import { ProjectRepository } from '@/repositories/project.repository'
 import { EmailService } from './email/email.service'
 
@@ -30,6 +31,26 @@ export class ProjectService {
 
     const newProject = await this.projectRepository.create(data)
     return newProject
+  }
+
+  async update(id: string, user: User, data: ProjectUpdateType): Promise<Project> {
+    const project = await this.projectRepository.getById(id)
+    if (!project) throw new AppError('Projeto não encontrado', 404, 'PROJECT_NOT_FOUND')
+    if (project.creatorId !== user.id && user.role !== 'admin')
+      throw new AppError('Você não tem permissão para editar este projeto', 403, 'FORBIDDEN')
+
+    if (user.role === 'mentor') delete data.approvalStatus
+
+    const updatedProject = Project.fromObject(
+      {
+        ...project.toObject(),
+        ...data,
+      },
+      project.members
+    )
+
+    await this.projectRepository.update(updatedProject)
+    return updatedProject
   }
 
   async list(data?: ProjectsListQueryType) {
@@ -79,7 +100,7 @@ export class ProjectService {
       )
     if (project.status !== 'active')
       throw new AppError('Projeto não está ativo', 409, 'PROJECT_NOT_ACTIVE')
-    console.log('project', project, user)
+
     if (project.members.some((participant) => participant.id === user.id))
       throw new AppError('Você já está participando deste projeto', 409, 'ALREADY_PARTICIPATING')
 

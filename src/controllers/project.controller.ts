@@ -2,13 +2,14 @@ import { Request, Response } from 'express'
 
 import { AppError } from '@/errors/AppErro'
 import { Project } from '@/models/domain/project'
-import { ProjectCreationSchema } from '@/models/dto/project/create.dto'
-import { ProjectsListQuerySchema } from '@/models/dto/project/list.dto'
-import { ProjectService } from '@/services/project.service'
-import { UserService } from '@/services/user.service'
-import { ProjectApplySchema } from '@/models/dto/project/apply.dto'
 import { User } from '@/models/domain/user'
 import { FeedbackCreateSchema } from '@/models/dto/feedback/create.dto'
+import { ProjectApplySchema } from '@/models/dto/project/apply.dto'
+import { ProjectCreationSchema } from '@/models/dto/project/create.dto'
+import { ProjectsListQuerySchema } from '@/models/dto/project/list.dto'
+import { ProjectUpdateSchema } from '@/models/dto/project/update.dto'
+import { ProjectService } from '@/services/project.service'
+import { UserService } from '@/services/user.service'
 
 export interface ProjectController {
   createProject: (req: Request, res: Response) => Promise<void>
@@ -114,22 +115,16 @@ export function makeProjectController(
       // TODO Update o projeto no banco de dados
 
       const id = req.params?.id
+      const user = User.fromObject(req.user)
+      const { success, error, data } = ProjectUpdateSchema.safeParse(req.body)
+      if (!success) {
+        res.status(422).json({ errors: error.flatten() })
+        return
+      }
 
-      res.status(200).json({
-        id,
-        name: 'depereo eum ab',
-        description: 'Aegrus aliqua textor vetus attero nihil.',
-        creatorId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        tags: ['tags'],
-        needsMentors: true,
-        needsDevs: true,
-        maxParticipants: 3,
-        status: 'active',
-        approvalStatus: 'pending',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        members: [],
-      })
+      const project = await projectService.update(id, user, data)
+
+      res.status(200).json(project.toObject())
     },
     async applyToProject(req: Request, res: Response) {
       const id = req.params?.id
