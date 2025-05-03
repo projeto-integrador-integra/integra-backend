@@ -86,8 +86,6 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
       )
     }
 
-    console.log('Payload:', payload)
-
     req.user = {
       sub: payload.sub,
       email: payload.email ?? payload.username ?? '',

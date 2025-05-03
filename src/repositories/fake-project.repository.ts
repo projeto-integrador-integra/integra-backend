@@ -91,8 +91,6 @@ export class FakeProjectRepository implements ProjectRepository {
     const { page = 1, limit = 10, status, title } = params
     const offset = (page - 1) * limit
 
-    console.log('userId', userId)
-
     const myProject = this.db.participants.find((p) => p.userId === userId)
     if (!myProject) return { projects: [], total: 0, page, limit }
 

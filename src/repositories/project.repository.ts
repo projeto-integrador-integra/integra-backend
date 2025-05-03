@@ -66,7 +66,8 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
       .leftJoin(users, eq(projectParticipants.userId, users.id))
       .where(eq(projects.id, id))
-    if (!result) return null
+
+    if (!result || result.length === 0) return null
     const project = Project.fromObject(result[0].projects)
 
     result.forEach((row) => {
