@@ -203,4 +203,12 @@ export class ProjectService {
 
     return feedbacks
   }
+
+  async userSummary(user: User) {
+    const projects = await this.projectRepository.userSummary(user.id)
+
+    if (['admin', 'company'].includes(user.role)) delete projects.pending
+
+    return projects
+  }
 }

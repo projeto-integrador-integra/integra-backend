@@ -3,6 +3,8 @@ import { FakeEmailService } from '@/services/email/fake-email.service'
 import { UserService } from '@/services/user.service'
 import { makeUserController } from './user.controller'
 
+import { FakeProjectRepository } from '@/repositories/fake-project.repository'
+import { ProjectService } from '@/services/project.service'
 import { createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
 import { Request } from 'express'
@@ -12,7 +14,9 @@ const mockDB = new FakeDatabase()
 const userRepository = new FakeUserRepository(mockDB)
 const userService = new UserService(userRepository)
 const fakeEmailService = new FakeEmailService()
-const controller = makeUserController(userService, fakeEmailService)
+const projectRepository = new FakeProjectRepository(mockDB)
+const projectService = new ProjectService(projectRepository, fakeEmailService)
+const controller = makeUserController(userService, fakeEmailService, projectService)
 
 describe('UserController', () => {
   beforeEach(() => {

@@ -3,6 +3,7 @@ import { UserCreationSchema } from '@/models/dto/user/create.dto'
 import { ListUsersQuerySchema } from '@/models/dto/user/list.dto'
 import { UserUpdateSchema } from '@/models/dto/user/update.dto'
 import { EmailService } from '@/services/email/email.service'
+import { ProjectService } from '@/services/project.service'
 import { UserService } from '@/services/user.service'
 import { Request, Response } from 'express'
 
@@ -16,7 +17,8 @@ export interface UserController {
 
 export function makeUserController(
   userService: UserService,
-  emailService: EmailService
+  emailService: EmailService,
+  projectService: ProjectService
 ): UserController {
   return {
     async createUser(req: Request, res: Response) {
@@ -72,7 +74,10 @@ export function makeUserController(
       const user = await userService.getBySub(sub)
       if (!user) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
 
-      res.status(200).json(user.toObject())
+      let projects = {}
+      if (user.approvalStatus === 'approved') projects = await projectService.userSummary(user)
+
+      res.status(200).json({ ...user.toObject(), projects })
     },
   }
 }

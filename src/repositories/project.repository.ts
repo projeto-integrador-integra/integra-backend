@@ -44,6 +44,7 @@ export interface ProjectRepository {
     rating: number
   }): Promise<{ result: Feedback }>
   getProjectFeedbacks(params: { projectId: string }): Promise<{ feedbacks: Feedback[] }>
+  userSummary(user: string): Promise<{ pending?: number; approved: number; closed: number }>
 }
 
 export class DrizzleProjectRepository implements ProjectRepository {
@@ -290,5 +291,24 @@ export class DrizzleProjectRepository implements ProjectRepository {
     }))
 
     return { feedbacks: feedbacksList }
+  }
+
+  async userSummary(user: string) {
+    const result = await this.db
+      .select({
+        pending: count().as('pending'),
+        approved: count().as('approved'),
+        closed: count().as('closed'),
+      })
+      .from(projects)
+      .where(eq(projects.creatorId, user))
+      .groupBy(projects.creatorId)
+
+    if (result.length === 0) return { pending: 0, approved: 0, closed: 0 }
+    return {
+      pending: result[0].pending,
+      approved: result[0].approved,
+      closed: result[0].closed,
+    }
   }
 }
