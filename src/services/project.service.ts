@@ -166,6 +166,11 @@ export class ProjectService {
 
     if (!result) throw new AppError('Erro ao enviar feedback', 500, 'FEEDBACK_SUBMIT_ERROR')
 
+    if (project.status !== 'closed') {
+      project.status = 'closed'
+      await this.projectRepository.update(project)
+    }
+
     return result
   }
 }
