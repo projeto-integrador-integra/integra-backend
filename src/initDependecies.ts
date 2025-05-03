@@ -14,12 +14,12 @@ export async function initDependencies() {
 
   const emailService = await makeEmailService()
   const userRepository = new DrizzleUserRepository(db)
-  const userService = new UserService(userRepository)
-  const userController = makeUserController(userService, emailService)
   const projectRepository = new DrizzleProjectRepository(db)
+  const userService = new UserService(userRepository)
   const projectService = new ProjectService(projectRepository, emailService)
-  const projectController = makeProjectController(projectService, userService)
   const authService = await makeAuthService()
+  const userController = makeUserController(userService, emailService, projectService)
+  const projectController = makeProjectController(projectService, userService)
   const authController = makeAuthController(authService)
 
   return {

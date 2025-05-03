@@ -191,6 +191,17 @@ export class FakeProjectRepository implements ProjectRepository {
     return { feedbacks }
   }
 
+  async userSummary(
+    userId: string
+  ): Promise<{ pending: number; approved: number; closed: number }> {
+    const projects = this.db.projects.filter((project) => project.creatorId === userId)
+    const pending = projects.filter((project) => project.approvalStatus === 'pending').length
+    const approved = projects.filter((project) => project.approvalStatus === 'approved').length
+    const closed = projects.filter((project) => project.status === 'closed').length
+
+    return { pending, approved, closed }
+  }
+
   clear(): void {
     this.db.projects = []
   }
