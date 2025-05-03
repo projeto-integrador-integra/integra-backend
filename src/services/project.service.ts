@@ -173,4 +173,13 @@ export class ProjectService {
 
     return result
   }
+
+  async getProjectFeedbacks({ projectId }: { projectId: string }) {
+    const project = await this.projectRepository.getById(projectId)
+    if (!project) throw new AppError('Projeto não encontrado', 404, 'PROJECT_NOT_FOUND')
+
+    const feedbacks = await this.projectRepository.getProjectFeedbacks({ projectId })
+
+    return feedbacks
+  }
 }
