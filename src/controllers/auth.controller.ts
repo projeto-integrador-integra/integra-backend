@@ -43,6 +43,7 @@ export function makeAuthController(authService: AuthService): AuthController {
         res
           .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
           .cookie('idToken', tokens.idToken, getCookieOptions(req))
+          .cookie('refreshToken', tokens.refreshToken, getCookieOptions(req))
           .json({ message: 'Login realizado com sucesso.' })
       } catch (err: unknown) {
         const message = err instanceof AppError ? String(err.message) : 'Erro ao fazer login.'
@@ -66,7 +67,8 @@ export function makeAuthController(authService: AuthService): AuthController {
     },
 
     async refreshTokens(req: Request, res: Response) {
-      const { refreshToken } = req.body
+      const refreshToken = req.cookies.refreshToken || req.headers.authorization?.split(' ')[1]
+      console.log('Refresh tokens', refreshToken)
 
       try {
         const tokens = await authService.refreshTokens(refreshToken)
@@ -74,6 +76,7 @@ export function makeAuthController(authService: AuthService): AuthController {
         res
           .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
           .cookie('idToken', tokens.idToken, getCookieOptions(req))
+          .cookie('refreshToken', tokens.refreshToken, getCookieOptions(req))
           .json({ message: 'Tokens atualizados com sucesso.' })
       } catch (err: unknown) {
         const message =
