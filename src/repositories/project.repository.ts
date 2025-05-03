@@ -126,7 +126,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .select()
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
-      .innerJoin(users, eq(projectParticipants.userId, users.id))
+      .leftJoin(users, eq(projectParticipants.userId, users.id))
       .where(and(...query))
       .limit(limit)
       .offset(offset)
