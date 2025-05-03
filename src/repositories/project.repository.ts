@@ -101,13 +101,12 @@ export class DrizzleProjectRepository implements ProjectRepository {
   }
 
   async listExplorable({
-    page = 1,
-    limit = 10,
     userId,
-    title,
-    createdBy,
-    approvalStatus,
-  }: ProjectsListQueryType & { userId: string }) {
+    params: { page = 1, limit = 10, title, createdBy, approvalStatus },
+  }: {
+    userId: string
+    params: ProjectsListQueryType
+  }) {
     const offset = (page - 1) * limit
     const query = [
       or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
@@ -138,14 +137,12 @@ export class DrizzleProjectRepository implements ProjectRepository {
   }
 
   async listMyProjects({
-    page = 1,
-    limit = 10,
-    approvalStatus,
-    createdBy,
-    status,
-    title,
     userId,
-  }: ProjectsListQueryType & { userId: string }) {
+    params: { page = 1, limit = 10, approvalStatus, createdBy, status, title },
+  }: {
+    userId: string
+    params: ProjectsListQueryType
+  }) {
     const offset = (page - 1) * limit
     const query = [isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)]
     if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
