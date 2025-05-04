@@ -1,9 +1,7 @@
 import {
-  Body,
   Column,
   Container,
   Head,
-  Heading,
   Html,
   Img,
   Link,
@@ -11,13 +9,21 @@ import {
   Row,
   Section,
   Text,
+  Body,
+  Heading,
 } from '@react-email/components'
 
-interface WelcomeEmailProps {
+interface GroupFormedEmailProps {
   name: string
+  projectName: string
+  projectUrl: string
 }
 
-const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
+const GroupFormedEmail = ({
+  name = 'Teste',
+  projectName = 'Nome do Projeto',
+  projectUrl = 'https://integra.charmbyte.dev',
+}: GroupFormedEmailProps) => {
   return (
     <Html>
       <Head>
@@ -28,7 +34,10 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
           rel="stylesheet"
         />
       </Head>
-      <Preview>Bem-vindo(a) ao Integra! Vamos começar?</Preview>
+      <Preview>
+        Olá {name}, o grupo do projeto {projectName} está completo. Visite o site para conhecer os
+        demais integrantes e começar a trabalhar juntos.
+      </Preview>
       <Body
         style={{ backgroundColor: '#f9f9f9', padding: '20px', fontFamily: 'Inter, sans-serif' }}
       >
@@ -62,18 +71,20 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
             </Column>
           </Row>
         </Section>
+
         <Container style={{ backgroundColor: '#ffffff', padding: '40px', borderRadius: '8px' }}>
           <Heading style={{ marginBottom: '20px', fontSize: '18px' }}>
-            Bem-vindo(a), {name}!
+            Grupo completo, {name}!
           </Heading>
+
           <Text style={{ marginBottom: '20px' }}>
-            Estamos felizes por ter você no Integra. Agora você pode explorar novas oportunidades,
-            conectar-se com mentores e fazer seu projeto acontecer.
+            O grupo do seu projeto <strong>{projectName}</strong> foi formado com sucesso. Agora
+            você pode acessar o painel, conhecer os integrantes e dar início à colaboração.
           </Text>
+
           <Section style={{ textAlign: 'center', marginTop: '30px' }}>
             <Link
-              href="https://integra.charmbyte.dev/login"
-              target="_blank"
+              href={projectUrl}
               style={{
                 display: 'inline-block',
                 padding: '12px 24px',
@@ -84,11 +95,12 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
                 borderRadius: '4px',
               }}
             >
-              Começar agora
+              Acessar projeto
             </Link>
           </Section>
-          <Text style={{ fontSize: '12px', color: '#888', marginTop: '60px' }}>
-            Você recebeu este e-mail porque se cadastrou no Integra.
+
+          <Text style={{ fontSize: '12px', color: '#888', marginTop: '40px' }}>
+            Caso tenha dúvidas ou precise de ajuda, estamos por aqui para apoiar você.
           </Text>
         </Container>
       </Body>
@@ -96,5 +108,8 @@ const WelcomeEmail = ({ name = 'Teste' }: WelcomeEmailProps) => {
   )
 }
 
-export default WelcomeEmail
-WelcomeEmail.requiredProps = ['name']
+export default GroupFormedEmail
+
+GroupFormedEmail.requiredProps = ['name']
+GroupFormedEmail.requiredProps = ['projectName']
+GroupFormedEmail.requiredProps = ['projectUrl']
