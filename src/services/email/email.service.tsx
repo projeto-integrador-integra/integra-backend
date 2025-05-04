@@ -24,12 +24,14 @@ export class ResendEmailService implements EmailService {
   private resend: Resend
   private templates: {
     welcome: string
+    groupFormed: string
   }
 
   constructor(apiKey: string) {
     this.resend = new Resend(apiKey)
     this.templates = {
       welcome: this.loadTemplate('../../emails/templates/welcome.html'),
+      groupFormed: this.loadTemplate('../../emails/templates/group-formed.html'),
     }
   }
 
@@ -83,8 +85,13 @@ export class ResendEmailService implements EmailService {
   }) {
     const firstName = name.trim().split(' ')[0] || 'Usuário'
     const formattedName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase()
+    const projName = projectName.trim().split(' ')[0] || 'Projeto'
+    const formattedProjectName = projName.charAt(0).toUpperCase() + projName.slice(1).toLowerCase()
 
-    const personalizedHtml = this.templates.welcome.replace('{{name}}', formattedName)
+    const personalizedHtml = this.templates.groupFormed
+      .replace('{{name}}', formattedName)
+      .replace('{{projectName}}', formattedProjectName)
+      .replace('{{projectUrl}}', 'https://integra.charmbyte.dev/login')
 
     try {
       await this.sendEmail({

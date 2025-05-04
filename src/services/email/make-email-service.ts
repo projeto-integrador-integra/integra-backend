@@ -1,5 +1,3 @@
-// src/services/email/make-email-service.ts
-
 import { ResendEmailService } from './email.service'
 import { FakeEmailService } from './fake-email.service'
 import { loadEnv } from '@/config/env'
