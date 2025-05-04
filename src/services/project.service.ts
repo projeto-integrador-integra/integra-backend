@@ -59,13 +59,15 @@ export class ProjectService {
     return result
   }
 
-  async listExplorable({ userId, params }: { userId: string; params: ProjectsListQueryType }) {
+  async listExplorable({ user, params }: { user: User; params: ProjectsListQueryType }) {
     const result = await this.projectRepository.listExplorable({
-      userId,
+      userId: user.id,
       params: {
         ...params,
         approvalStatus: 'approved',
         status: 'active',
+        needsMentors: user.role === 'mentor',
+        needsDevs: user.role === 'dev',
       },
     })
 

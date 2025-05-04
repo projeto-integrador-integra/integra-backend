@@ -74,8 +74,9 @@ export function makeProjectController(
         return
       }
 
+      const user = User.fromObject(req.user)
       const projects = await projectService.listExplorable({
-        userId,
+        user,
         params: data,
       })
 

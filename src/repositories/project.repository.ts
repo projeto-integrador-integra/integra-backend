@@ -24,7 +24,7 @@ export interface ProjectRepository {
   ): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   listExplorable(params: {
     userId: string
-    params?: ProjectsListQueryType
+    params?: ProjectsListQueryType & { needsDevs?: boolean; needsMentors?: boolean }
   }): Promise<{ projects: Project[]; total: number; page: number; limit: number }>
   listMyProjects(params: {
     userId: string
@@ -138,10 +138,10 @@ export class DrizzleProjectRepository implements ProjectRepository {
 
   async listExplorable({
     userId,
-    params: { page = 1, limit = 10, title, createdBy, approvalStatus },
+    params: { page = 1, limit = 10, title, createdBy, approvalStatus, needsDevs, needsMentors },
   }: {
     userId: string
-    params: ProjectsListQueryType
+    params: ProjectsListQueryType & { needsDevs?: boolean; needsMentors?: boolean }
   }) {
     const offset = (page - 1) * limit
     const query = [
@@ -151,6 +151,8 @@ export class DrizzleProjectRepository implements ProjectRepository {
     if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
     if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
+    if (needsDevs) query.push(eq(projects.needsDevs, needsDevs))
+    if (needsMentors) query.push(eq(projects.needsMentors, needsMentors))
 
     const [total] = await this.db
       .select({ count: count() })
