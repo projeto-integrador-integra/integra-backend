@@ -106,11 +106,17 @@ export class ProjectService {
 
     const isMentorBlocked = !project.needsMentors && user.role === 'mentor'
     const isDevBlocked = !project.needsDevs && user.role === 'dev'
-    if (isMentorBlocked || isDevBlocked)
+    if (isMentorBlocked)
       throw new AppError(
         'Este projeto não precisa de mentores',
         409,
         'PROJECT_DOES_NOT_NEED_MENTORS'
+      )
+    if (isDevBlocked)
+      throw new AppError(
+        'Este projeto não precisa de desenvolvedores',
+        409,
+        'PROJECT_DOES_NOT_NEED_DEVS'
       )
 
     const userProjects = await this.projectRepository.listMyProjects({
@@ -125,7 +131,8 @@ export class ProjectService {
       )
 
     if (user.role === 'mentor') project.needsMentors = false
-    if (user.role === 'dev' && project.maxParticipants === project.members.length - 1)
+    const devs = project.members.filter((m) => m.role === 'dev')
+    if (user.role === 'dev' && project.maxParticipants === devs.length + 1)
       project.needsDevs = false
 
     const response = await this.projectRepository.applyToProject({
