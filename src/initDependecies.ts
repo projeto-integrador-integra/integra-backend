@@ -18,7 +18,7 @@ export async function initDependencies() {
   const userService = new UserService(userRepository)
   const projectService = new ProjectService(projectRepository, emailService)
   const authService = await makeAuthService()
-  const userController = makeUserController(userService, emailService, projectService)
+  const userController = makeUserController(userService, projectService)
   const projectController = makeProjectController(projectService, userService)
   const authController = makeAuthController(authService)
 

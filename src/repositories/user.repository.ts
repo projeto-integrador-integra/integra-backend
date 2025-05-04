@@ -6,6 +6,7 @@ import { ListUsersQueryType } from '@/models/dto/user/list.dto'
 
 export interface UserRepository {
   create(user: User): Promise<User>
+  update(user: User): Promise<User>
   getById(id: string): Promise<User | null>
   getBySub(sub: string): Promise<User | null>
   getByEmail(email: string): Promise<User | null>
@@ -18,6 +19,11 @@ export class DrizzleUserRepository implements UserRepository {
 
   async create(user: User): Promise<User> {
     await this.db.insert(users).values(user.toObject())
+    return user
+  }
+
+  async update(user: User): Promise<User> {
+    await this.db.update(users).set(user.toObject()).where(eq(users.id, user.id)).execute()
     return user
   }
 

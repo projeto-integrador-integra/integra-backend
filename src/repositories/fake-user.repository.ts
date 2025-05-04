@@ -27,6 +27,14 @@ export class FakeUserRepository implements UserRepository {
     return user
   }
 
+  async update(user: User): Promise<User> {
+    const index = this.db.users.findIndex((u) => u.id === user.id)
+    if (index !== -1) {
+      this.db.users[index] = user
+    }
+    return user
+  }
+
   async getById(id: string): Promise<User | null> {
     const [user] = await this.db.users.filter((user: User) => user.id === id)
     return user ? new User(user) : null

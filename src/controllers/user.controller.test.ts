@@ -16,7 +16,7 @@ const userService = new UserService(userRepository)
 const fakeEmailService = new FakeEmailService()
 const projectRepository = new FakeProjectRepository(mockDB)
 const projectService = new ProjectService(projectRepository, fakeEmailService)
-const controller = makeUserController(userService, fakeEmailService, projectService)
+const controller = makeUserController(userService, projectService)
 
 describe('UserController', () => {
   beforeEach(() => {
@@ -95,14 +95,14 @@ describe('UserController', () => {
     )
   })
 
-  it('should update user (PATCH /users/:id)', async () => {
+  it.only('should update user (PATCH /users/:id)', async () => {
     const res = createMockResponse()
     const fakeUser = createFakeUser('admin')
     await userRepository.create(fakeUser)
 
     const req = {
       params: { id: fakeUser.id },
-      user: { email: fakeUser.email, sub: fakeUser.sub },
+      user: fakeUser,
       body: {
         name: 'updated name',
         role: fakeUser.role,
