@@ -19,6 +19,20 @@ export class UserService {
     return user
   }
 
+  async update(creator: User, id: string, data: Partial<UserType>): Promise<User> {
+    if (creator.role !== 'admin') {
+      delete data.approvalStatus
+      delete data.role
+      if (creator.id !== id) throw new AppError('User not authorized', 403, 'USER_NOT_AUTHORIZED')
+    }
+
+    const prevUser = await this.userRepository.getById(id)
+    if (!prevUser) throw new AppError('User not found', 404, 'USER_NOT_FOUND')
+
+    const user = User.fromObject({ ...prevUser.toObject(), ...data })
+    return await this.userRepository.update(user)
+  }
+
   async getById(id: string): Promise<User | null> {
     const user = await this.userRepository.getById(id)
     return user
