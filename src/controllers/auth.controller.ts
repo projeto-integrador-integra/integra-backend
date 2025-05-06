@@ -26,6 +26,7 @@ export function makeAuthController(authService: AuthService): AuthController {
         res
           .cookie('idToken', tokens.idToken, getCookieOptions(req))
           .cookie('accessToken', tokens.accessToken, getCookieOptions(req))
+          .cookie('refreshToken', tokens.refreshToken, getCookieOptions(req))
           .status(201)
           .json({ message: 'Usuário criado e logado com sucesso.' })
       } catch (err: unknown) {
@@ -60,6 +61,7 @@ export function makeAuthController(authService: AuthService): AuthController {
         res
           .clearCookie('accessToken')
           .clearCookie('idToken')
+          .clearCookie('refreshToken')
           .json({ message: 'Logout realizado com sucesso.' })
       } catch (err: unknown) {
         const message = err instanceof AppError ? String(err.message) : 'Erro ao fazer logout.'
