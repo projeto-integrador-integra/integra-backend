@@ -12,6 +12,7 @@ export const projectParticipants = pgTable('project_participants', {
     .references(() => projects.id),
   message: text('message').default(''),
   joinedAt: timestamp('joined_at').defaultNow(),
+  deletedAt: timestamp('deleted_at'),
 })
 
 export interface ProjectParticipant {
@@ -20,4 +21,5 @@ export interface ProjectParticipant {
   projectId: string
   message: string | null
   joinedAt: Date | null
+  deletedAt?: Date | null
 }

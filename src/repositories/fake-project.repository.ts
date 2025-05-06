@@ -151,6 +151,7 @@ export class FakeProjectRepository implements ProjectRepository {
       projectId,
       message,
       joinedAt: new Date(),
+      deletedAt: null,
     })
     return { success: true, message: 'Applied successfully' }
   }
@@ -200,6 +201,22 @@ export class FakeProjectRepository implements ProjectRepository {
     const closed = projects.filter((project) => project.status === 'closed').length
 
     return { pending, approved, closed }
+  }
+
+  async leaveProject({
+    projectId,
+    userId,
+  }: {
+    projectId: string
+    userId: string
+  }): Promise<{ success: boolean; message: string }> {
+    const participantIndex = this.db.participants.findIndex(
+      (p) => p.projectId === projectId && p.userId === userId
+    )
+    if (participantIndex === -1) return { success: false, message: 'Not a participant' }
+
+    this.db.participants.splice(participantIndex, 1)
+    return { success: true, message: 'Left project successfully' }
   }
 
   clear(): void {

@@ -45,6 +45,13 @@ export interface ProjectRepository {
   }): Promise<{ result: Feedback }>
   getProjectFeedbacks(params: { projectId: string }): Promise<{ feedbacks: Feedback[] }>
   userSummary(user: string): Promise<{ pending?: number; approved: number; closed: number }>
+  leaveProject({
+    projectId,
+    userId,
+  }: {
+    projectId: string
+    userId: string
+  }): Promise<{ success: boolean; message: string }>
 }
 
 export class DrizzleProjectRepository implements ProjectRepository {
@@ -66,7 +73,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
       .from(projects)
       .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
       .leftJoin(users, eq(projectParticipants.userId, users.id))
-      .where(eq(projects.id, id))
+      .where(and(eq(projects.id, id), isNull(projectParticipants.deletedAt)))
 
     if (!result || result.length === 0) return null
     const project = Project.fromObject(result[0].projects)
@@ -90,7 +97,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
   }: ProjectsListQueryType) {
     const offset = (page - 1) * limit
 
-    const query = []
+    const query = [isNull(projectParticipants.deletedAt)]
     if (status) query.push(eq(projects.status, status))
     if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
@@ -147,6 +154,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
     const query = [
       or(isNull(projectParticipants.userId), ne(projectParticipants.userId, userId)),
       eq(projects.status, 'active'),
+      isNull(projectParticipants.deletedAt),
     ]
     if (title) query.push(ilike(projects.name, `%${title.trim()}%`))
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
@@ -182,7 +190,11 @@ export class DrizzleProjectRepository implements ProjectRepository {
     params: ProjectsListQueryType
   }) {
     const offset = (page - 1) * limit
-    const query = [isNotNull(projectParticipants.userId), eq(projectParticipants.userId, userId)]
+    const query = [
+      isNotNull(projectParticipants.userId),
+      eq(projectParticipants.userId, userId),
+      isNull(projectParticipants.deletedAt),
+    ]
     if (approvalStatus) query.push(eq(projects.approvalStatus, approvalStatus))
     if (createdBy) query.push(eq(projects.creatorId, createdBy))
     if (status) query.push(eq(projects.status, status))
@@ -296,7 +308,10 @@ export class DrizzleProjectRepository implements ProjectRepository {
   }
 
   async userSummary(userId: string) {
-    const baseWhere = or(eq(projects.creatorId, userId), eq(projectParticipants.userId, userId))
+    const baseWhere = and(
+      or(eq(projects.creatorId, userId), eq(projectParticipants.userId, userId)),
+      isNull(projectParticipants.deletedAt)
+    )
 
     const [pendingCount, approvedCount, closedCount] = await Promise.all([
       this.db
@@ -328,5 +343,24 @@ export class DrizzleProjectRepository implements ProjectRepository {
       approved: approvedCount,
       closed: closedCount,
     }
+  }
+
+  async leaveProject({ projectId, userId }: { projectId: string; userId: string }) {
+    const result = await this.db
+      .update(projectParticipants)
+      .set({ deletedAt: new Date() })
+      .where(
+        and(
+          eq(projectParticipants.projectId, projectId),
+          eq(projectParticipants.userId, userId),
+          isNull(projectParticipants.deletedAt)
+        )
+      )
+      .returning()
+
+    if (result.length === 0)
+      throw new AppError('Failed to leave project', 500, 'LEAVE_PROJECT_FAILED')
+
+    return { success: true, message: 'Left project successfully' }
   }
 }

@@ -56,5 +56,12 @@ export function createProjectRoutes(
     requireAccess(userService, ['dev', 'mentor']),
     controller.getProjectFeedbacks
   )
+
+  router.delete(
+    '/:id/leave',
+    requireAccess(userService, ['dev', 'mentor']),
+    controller.leaveProject
+  )
+
   return router
 }

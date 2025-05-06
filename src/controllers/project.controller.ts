@@ -22,6 +22,7 @@ export interface ProjectController {
   submitFeedback: (req: Request, res: Response) => Promise<void>
   getProjectFeedbacks: (req: Request, res: Response) => Promise<void>
   getProjectSummary: (req: Request, res: Response) => Promise<void>
+  leaveProject: (req: Request, res: Response) => Promise<void>
 }
 
 export function makeProjectController(
@@ -204,6 +205,19 @@ export function makeProjectController(
       if (!project) throw new AppError('Project not found', 404)
 
       res.status(200).json(project)
+    },
+
+    async leaveProject(req: Request, res: Response) {
+      const id = req.params?.id
+      const userId = req.user.id
+      if (!userId) throw new AppError('User not found', 404)
+      const user = User.fromObject(req.user)
+      const project = await projectService.leaveProject({
+        projectId: id,
+        user,
+      })
+
+      res.status(200).json(project.toObject())
     },
   }
 }
