@@ -21,7 +21,10 @@ export class ProjectService {
     if (existingProject.length > 0)
       throw new AppError('Projeto já existe', 409, 'PROJECT_ALREADY_EXISTS')
 
-    const userProjects = await this.projectRepository.listProjects({ createdBy: data.creatorId })
+    const userProjects = await this.projectRepository.listProjects({
+      createdBy: data.creatorId,
+      status: 'active',
+    })
     if (userProjects.total >= MAX_PROJECTS_PER_USER)
       throw new AppError(
         `Só pode ser criado ${MAX_PROJECTS_PER_USER} projetos por usuário`,
