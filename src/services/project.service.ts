@@ -221,4 +221,21 @@ export class ProjectService {
     if (!['admin', 'company'].includes(user.role)) delete projects.pending
     return projects
   }
+
+  async leaveProject({ projectId, user }: { projectId: string; user: User }) {
+    const project = await this.projectRepository.getById(projectId)
+    if (!project) throw new AppError('Projeto não encontrado', 404, 'PROJECT_NOT_FOUND')
+    if (!project.members.some((participant) => participant.id === user.id))
+      throw new AppError('Você não está participando deste projeto', 409, 'NOT_PARTICIPATING')
+
+    await this.projectRepository.leaveProject({
+      projectId,
+      userId: user.id,
+    })
+
+    return Project.fromObject({
+      ...project.toObject(),
+      members: project.members.filter((member) => member.id !== user.id),
+    })
+  }
 }
