@@ -1,10 +1,7 @@
 import { FakeDatabase, FakeUserRepository } from '@/repositories/fake-user.repository'
-import { FakeEmailService } from '@/services/email/fake-email.service'
 import { UserService } from '@/services/user.service'
 import { makeUserController } from './user.controller'
 
-import { FakeProjectRepository } from '@/repositories/fake-project.repository'
-import { ProjectService } from '@/services/project.service'
 import { createFakeUser, expectUuid } from '@/testes/helper'
 import { createMockResponse } from '@/testes/response'
 import { Request } from 'express'
@@ -13,10 +10,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mockDB = new FakeDatabase()
 const userRepository = new FakeUserRepository(mockDB)
 const userService = new UserService(userRepository)
-const fakeEmailService = new FakeEmailService()
-const projectRepository = new FakeProjectRepository(mockDB)
-const projectService = new ProjectService(projectRepository, fakeEmailService)
-const controller = makeUserController(userService, projectService)
+const controller = makeUserController(userService)
 
 describe('UserController', () => {
   beforeEach(() => {
