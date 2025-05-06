@@ -30,6 +30,8 @@ export function createProjectRoutes(
 
   router.get('/mine', requireAccess(userService, ['dev', 'mentor']), controller.getUserProjects)
 
+  router.get('/summary', controller.getProjectSummary)
+
   router.get('/:id', controller.getProjectById)
   router.patch(
     '/:id',
@@ -54,6 +56,5 @@ export function createProjectRoutes(
     requireAccess(userService, ['dev', 'mentor']),
     controller.getProjectFeedbacks
   )
-
   return router
 }

@@ -21,6 +21,7 @@ export interface ProjectController {
   getUserProjects: (req: Request, res: Response) => Promise<void>
   submitFeedback: (req: Request, res: Response) => Promise<void>
   getProjectFeedbacks: (req: Request, res: Response) => Promise<void>
+  getProjectSummary: (req: Request, res: Response) => Promise<void>
 }
 
 export function makeProjectController(
@@ -195,6 +196,14 @@ export function makeProjectController(
       })
 
       res.status(200).json(feedbacks)
+    },
+
+    async getProjectSummary(req: Request, res: Response) {
+      const user = User.fromObject(req.user)
+      const project = await projectService.userSummary(user)
+      if (!project) throw new AppError('Project not found', 404)
+
+      res.status(200).json(project)
     },
   }
 }
