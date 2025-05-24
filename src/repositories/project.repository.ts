@@ -115,6 +115,7 @@ export class DrizzleProjectRepository implements ProjectRepository {
     const [total] = await this.db
       .select({ count: count() })
       .from(projects)
+      .leftJoin(projectParticipants, eq(projects.id, projectParticipants.projectId))
       .where(and(...query))
 
     const projectList = this.groupProjectsWithEntities(listAll)
